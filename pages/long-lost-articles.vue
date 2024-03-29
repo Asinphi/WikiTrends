@@ -3,7 +3,9 @@
 </script>
 
 <template>
-  <h1>Long Lost Articles</h1>
+  <PageContainer>
+    <h1>Long Lost Articles</h1>
+  </PageContainer>
 </template>
 
 <style scoped>
