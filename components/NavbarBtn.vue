@@ -29,7 +29,6 @@ defineProps(["to"]);
   padding-bottom: 5px;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
   text-decoration: none;
   transition: color 0.2s;
 
