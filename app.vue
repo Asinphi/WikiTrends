@@ -38,11 +38,9 @@ glow {
   @include media-breakpoint-up(lg) {
     font-size: 18rem;
   }
-
   @include media-breakpoint-down(lg) {
     font-size: 8rem;
   }
-
   @include media-breakpoint-down(sm) {
     font-size: 4rem;
   }
@@ -67,6 +65,8 @@ body {
 
 .navbar {
   display: flex;
+  position: sticky;
+  top: 20px;
   margin: 0 auto;
   @include media-breakpoint-up(md) {
     width: 80%;
