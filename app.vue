@@ -33,6 +33,7 @@ glow {
   text-align: center;
   font-family: "Linux Libertine", serif;
   margin: 1rem 0;
+  cursor: default;
   animation: glow 1s ease-in-out infinite alternate;
   @include media-breakpoint-up(lg) {
     font-size: 18rem;
