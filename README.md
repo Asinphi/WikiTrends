@@ -1,7 +1,7 @@
 # ![logo](https://github.com/Asinphi/DatabasesProject/assets/93962200/cb9cb2e7-1c38-4bae-99f6-f6b659ef03be)
 
 ## About
-wikiTrends is a web-based application utilizing the Wikipedia API (MediaWiki) alongside the Pageview API to gather article information based upon user input. The trending page returns the top 3 trending articles for the day (or any date set by user), the search page allows a user to search by a keyword for an article and returns the view statistics for the given keyword, the "long lost article" page returns a rnadom article older than 10 years that has a low view count. 
+wikiTrends is a web-based application utilizing the Wikipedia API (MediaWiki) alongside the Pageview API to gather article information based upon user input. The trending page returns the top 3 trending articles for the day (or any date set by user), the search page allows a user to search by a keyword for an article and returns the view statistics for the given keyword, the "long lost article" page returns a random article older than 10 years that has a low view count. 
 
 ## Languages
 Front-end: JavaScript using a Nuxt.js framework bundled with Vue.js & D3.js rendering library
