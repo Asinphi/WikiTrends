@@ -16,3 +16,5 @@ Database: Oracle SQL Developer
 - [MediaWiki API](https://www.mediawiki.org/wiki/API:Main_page)
 - [Pageview API](https://wikitech.wikimedia.org/wiki/Analytics/AQS/Pageviews)
 - [SQL Developer](https://www.oracle.com/database/sqldeveloper/technologies/what-is-sql-developer/#:~:text=Oracle%20SQL%20Developer%20allows%20you,and%20altering%20your%20RESTful%20services.)
+- [cx_Oracle](https://oracle.github.io/python-cx_Oracle/)
+- [Oracle Instant Client](https://www.oracle.com/database/technologies/instant-client.html)
