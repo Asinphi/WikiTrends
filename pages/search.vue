@@ -3,7 +3,9 @@
 </script>
 
 <template>
-<h1>Search</h1>
+  <PageContainer>
+    <h1>Search</h1>
+  </PageContainer>
 </template>
 
 <style scoped>
