@@ -1,3 +1,3 @@
 class Config:
-    SQLALCHEMY_DATABASE_URI = 'oracle://aaldea:Elcyde312!!@oracle.cise.ufl.edu:1521/orcl'
+    SQLALCHEMY_DATABASE_URI = 'oracle+cx_oracle://aaldea:bM0JAgom2tszWgUAa6k16Ofl@oracle.cise.ufl.edu:1521/?service_name=orcl'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
