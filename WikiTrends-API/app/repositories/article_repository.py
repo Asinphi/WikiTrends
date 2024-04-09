@@ -1,5 +1,5 @@
 # article_repository.py
-import cx_Oracle
+import oracledb
 from app.models.article import Article
 from flask import current_app
 
@@ -9,7 +9,7 @@ class ArticleRepository:
         self.create_table_if_not_exists()
 
     def create_table_if_not_exists(self):
-        with cx_Oracle.connect(self.db_config) as conn:
+        with oracledb.connect(self.db_config) as conn:
             cursor = conn.cursor()
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS Article (
@@ -23,7 +23,7 @@ class ArticleRepository:
             conn.commit()
 
     def get_by_title(self, title):
-        with cx_Oracle.connect(self.db_config) as conn:
+        with oracledb.connect(self.db_config) as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT ArticleID, Title, PostDate, LastUpdated FROM Article WHERE Title = :title", title=title)
             row = cursor.fetchone()
@@ -33,7 +33,7 @@ class ArticleRepository:
             return None
 
     def create(self, article):
-        with cx_Oracle.connect(self.db_config) as conn:
+        with oracledb.connect(self.db_config) as conn:
             cursor = conn.cursor()
             cursor.execute("""
                 INSERT INTO Article (ArticleID, Title, PostDate, LastUpdated)

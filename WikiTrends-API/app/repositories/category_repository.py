@@ -1,5 +1,5 @@
 # category_repository.py
-import cx_Oracle
+import oracledb
 from app.models.category import Category
 from flask import current_app
 
@@ -9,7 +9,7 @@ class CategoryRepository:
         self.create_table_if_not_exists()
 
     def create_table_if_not_exists(self):
-        with cx_Oracle.connect(self.db_config) as conn:
+        with oracledb.connect(self.db_config) as conn:
             cursor = conn.cursor()
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS Categories (
@@ -27,7 +27,7 @@ class CategoryRepository:
             conn.commit()
 
     def get_by_name(self, category_name):
-        with cx_Oracle.connect(self.db_config) as conn:
+        with oracledb.connect(self.db_config) as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT CategoryID, CategoryName, ParentCategory FROM Categories WHERE CategoryName = :category_name", category_name=category_name)
             row = cursor.fetchone()
@@ -37,7 +37,7 @@ class CategoryRepository:
             return None
 
     def create(self, category):
-        with cx_Oracle.connect(self.db_config) as conn:
+        with oracledb.connect(self.db_config) as conn:
             cursor = conn.cursor()
             cursor.execute("""
                 INSERT INTO Categories (CategoryID, CategoryName, ParentCategory)
@@ -46,7 +46,7 @@ class CategoryRepository:
             conn.commit()
 
     def add_article_category(self, article_id, category_id):
-        with cx_Oracle.connect(self.db_config) as conn:
+        with oracledb.connect(self.db_config) as conn:
             cursor = conn.cursor()
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS HasCategory (

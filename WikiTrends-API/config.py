@@ -5,5 +5,5 @@ class Config:
     PORT = 1521
     SID = 'orcl'
 
-    SQLALCHEMY_DATABASE_URI = f'oracle+cx_oracle://{USER}:{PASSWORD}@{HOST}:{PORT}/{SID}'
+    SQLALCHEMY_DATABASE_URI = f'oracle+oracledb://{USER}:{PASSWORD}@{HOST}:{PORT}/{SID}'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
