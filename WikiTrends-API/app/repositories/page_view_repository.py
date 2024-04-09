@@ -1,5 +1,5 @@
 # page_view_repository.py
-import oracledb
+import cx_Oracle
 from app.models.page_view import PageView
 from flask import current_app
 
@@ -9,7 +9,7 @@ class PageViewRepository:
         self.create_table_if_not_exists()
 
     def create_table_if_not_exists(self):
-        with oracledb.connect(self.db_config) as conn:
+        with cx_Oracle.connect(self.db_config) as conn:
             cursor = conn.cursor()
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS PageView (
@@ -23,14 +23,14 @@ class PageViewRepository:
             conn.commit()
 
     def get_by_article_id(self, article_id):
-        with oracledb.connect(self.db_config) as conn:
+        with cx_Oracle.connect(self.db_config) as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT ArticleID, ViewDate, ViewCount FROM PageView WHERE ArticleID = :article_id", article_id=article_id)
             rows = cursor.fetchall()
             return [PageView(*row) for row in rows]
 
     def create(self, page_view):
-        with oracledb.connect(self.db_config) as conn:
+        with cx_Oracle.connect(self.db_config) as conn:
             cursor = conn.cursor()
             cursor.execute("""
                 INSERT INTO PageView (ArticleID, ViewDate, ViewCount)

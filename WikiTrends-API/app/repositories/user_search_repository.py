@@ -1,5 +1,5 @@
 # user_search_repository.py
-import oracledb
+import cx_Oracle
 from app.models.user_search import UserSearch
 from flask import current_app
 
@@ -9,7 +9,7 @@ class UserSearchRepository:
         self.create_table_if_not_exists()
 
     def create_table_if_not_exists(self):
-        with oracledb.connect(self.db_config) as conn:
+        with cx_Oracle.connect(self.db_config) as conn:
             cursor = conn.cursor()
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS UserSearch (
@@ -28,7 +28,7 @@ class UserSearchRepository:
             conn.commit()
 
     def get_by_search_term(self, search_term):
-        with oracledb.connect(self.db_config) as conn:
+        with cx_Oracle.connect(self.db_config) as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT SearchID, SearchDate, SearchTerm FROM UserSearch WHERE SearchTerm = :search_term", search_term=search_term)
             row = cursor.fetchone()
@@ -38,7 +38,7 @@ class UserSearchRepository:
             return None
 
     def create(self, user_search):
-        with oracledb.connect(self.db_config) as conn:
+        with cx_Oracle.connect(self.db_config) as conn:
             cursor = conn.cursor()
             cursor.execute("""
                 INSERT INTO UserSearch (SearchID, SearchDate, SearchTerm)
