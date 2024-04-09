@@ -1,7 +1,7 @@
 import logging
 from flask import Flask
 from config import Config
-import oracledb
+from sqlalchemy import create_engine
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -14,19 +14,13 @@ def test_db_connection():
         db_config = app.config['SQLALCHEMY_DATABASE_URI']
         logging.debug(f"Database connection string: {db_config}")
 
-        with oracledb.connect(db_config) as conn:
+        engine = create_engine(db_config)
+        with engine.connect() as connection:
             logging.debug("Connected to Oracle database successfully!")
-            logging.debug(f"Database version: {conn.version}")
-
-    except oracledb.Error as e:
-        error_obj, = e.args
-        logging.error(f"Error connecting to Oracle database: {e}")
-        logging.error(f"Error code: {error_obj.code}")
-        logging.error(f"Error message: {error_obj.message}")
-        logging.error(f"Error context: {error_obj.context}")
+            logging.debug(f"Database version: {connection.dialect.server_version_info}")
 
     except Exception as e:
-        logging.error(f"An unexpected error occurred: {e}")
+        logging.error(f"Error connecting to Oracle database: {e}")
 
 if __name__ == "__main__":
     test_db_connection()
