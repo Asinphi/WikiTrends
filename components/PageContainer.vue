@@ -13,7 +13,7 @@
   display: block;
   flex-direction: column;
   min-height: 40vh;
-  font-family: "Inter var experimental", Inter var, Inter, ui-sans-serif, system-ui, sans-serif;
+  font-family: "Cambria";
   padding: 20px;
   margin-top: 50px;
   @include media-breakpoint-up(lg) {
@@ -24,7 +24,7 @@
   }
 
   p {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
   }
 }
 </style>
