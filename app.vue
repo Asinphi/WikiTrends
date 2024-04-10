@@ -36,19 +36,19 @@ glow {
   cursor: default;
   animation: glow 1s ease-in-out infinite alternate;
   @include media-breakpoint-up(lg) {
-    font-size: 18rem;
+    font-size: 11rem;
   }
   @include media-breakpoint-down(lg) {
-    font-size: 8rem;
+    font-size: 3rem;
   }
   @include media-breakpoint-down(sm) {
-    font-size: 4rem;
+    font-size: 1rem;
   }
 
   &__w {
     color: #3498db;
     @include media-breakpoint-up(lg) {
-      font-size: 12rem;
+      font-size: 8rem;
     }
   }
 }
