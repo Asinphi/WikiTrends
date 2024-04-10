@@ -1,22 +1,14 @@
+from app.repositories.page_view_repository import PageViewRepository
 from app.repositories.article_repository import ArticleRepository
-from app.repositories.category_repository import CategoryRepository
-from app.utils.wikipedia_api_client import WikipediaAPIClient
 
-class ArticleService:
-    @staticmethod
-    async def get_page_view(title):
-        page_view = await PageViewRepository.get_by_title(title)
-        if page_view:
-            return page_view
-        # probably wont need this
-        page_view_data = await WikipediaAPIClient.get_page_view_info(title)
-        page_view = await PageViewRepository.create(page_view_data)
+class PageViewService:
+    def __init__(self, db_config):
+        self.page_view_repository = PageViewRepository(db_config)
+        self.article_repository = ArticleRepository(db_config)
 
-        categories = page_view_data.get('categories', [])
-        for category_name in categories:
-            category = await CategoryRepository.get_by_name(category_name)
-            if not category:
-                category = await CategoryRepository.create(category_name)
-            await page_view.add_category(category)
-
-        return page_view
+    async def get_page_views_by_article(self, article_title):
+        article = self.article_repository.get_by_title(article_title)
+        if article is None:
+            return []
+        page_views = self.page_view_repository.get_by_article_id(article.article_id)
+        return page_views

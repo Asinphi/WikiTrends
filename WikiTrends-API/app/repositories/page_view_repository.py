@@ -1,39 +1,57 @@
 # page_view_repository.py
-import cx_Oracle
+from sqlalchemy import text
 from app.models.page_view import PageView
-from flask import current_app
 
 class PageViewRepository:
-    def __init__(self):
-        self.db_config = current_app.config['SQLALCHEMY_DATABASE_URI']
+    def __init__(self, engine):
+        self.engine = engine
         self.create_table_if_not_exists()
 
     def create_table_if_not_exists(self):
-        with cx_Oracle.connect(self.db_config) as conn:
-            cursor = conn.cursor()
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS PageView (
+        table_name = 'PageView'
+        table = f"""
+            BEGIN
+                EXECUTE IMMEDIATE 'CREATE TABLE {table_name} (
                     ArticleID INTEGER NOT NULL,
                     ViewDate DATE NOT NULL,
                     ViewCount INTEGER NOT NULL,
                     PRIMARY KEY (ArticleID, ViewDate),
                     FOREIGN KEY (ArticleID) REFERENCES Article(ArticleID)
-                )
-            """)
-            conn.commit()
+                )';
+            EXCEPTION
+                WHEN OTHERS THEN
+                    IF SQLCODE != -955 THEN
+                        RAISE;
+                    END IF;
+            END;
+        """
+
+        try:
+            with self.engine.connect() as connection:
+                connection.execute(text(table))
+                connection.commit()
+                print(f"Table {table_name} created successfully.")
+        except Exception as e:
+            print(f"Error creating table {table_name}:\n", e)
 
     def get_by_article_id(self, article_id):
-        with cx_Oracle.connect(self.db_config) as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT ArticleID, ViewDate, ViewCount FROM PageView WHERE ArticleID = :article_id", article_id=article_id)
-            rows = cursor.fetchall()
+        with self.engine.connect() as conn:
+            result = conn.execute(text("SELECT ArticleID, ViewDate, ViewCount FROM PageView WHERE ArticleID = :article_id"), {'article_id': article_id})
+            rows = result.fetchall()
             return [PageView(*row) for row in rows]
 
     def create(self, page_view):
-        with cx_Oracle.connect(self.db_config) as conn:
-            cursor = conn.cursor()
-            cursor.execute("""
-                INSERT INTO PageView (ArticleID, ViewDate, ViewCount)
-                VALUES (:article_id, :view_date, :view_count)
-            """, article_id=page_view.article_id, view_date=page_view.view_date, view_count=page_view.view_count)
-            conn.commit()
+        with self.engine.connect() as conn:
+            try:
+                result = conn.execute(text("SELECT ArticleID, ViewDate FROM PageView WHERE ArticleID = :article_id AND ViewDate = :view_date"), {'article_id': page_view.article_id, 'view_date': page_view.view_date})
+                if result.fetchone() is None:
+                    conn.execute(text("""
+                        INSERT INTO PageView (ArticleID, ViewDate, ViewCount)
+                        VALUES (:article_id, :view_date, :view_count)
+                    """), {'article_id': page_view.article_id, 'view_date': page_view.view_date, 'view_count': page_view.view_count})
+                    conn.commit()
+                else:
+                    print(f"PageView for ArticleID {page_view.article_id} and ViewDate {page_view.view_date} already exists.")
+            except Exception as e:
+                print(f"Error inserting page view into database:\n", e)
+                conn.rollback()
