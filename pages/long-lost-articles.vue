@@ -5,6 +5,9 @@
 <template>
   <PageContainer>
     <h1>Long Lost Articles</h1>
+    <p>
+      
+    </p>
   </PageContainer>
 </template>
 
