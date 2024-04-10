@@ -6,7 +6,10 @@
         <input class="search-input" type="search" v-model="searchQuery" placeholder="Search" aria-label="Search">
         <button class="search-button" type="submit">Search</button>
       </form>
-      <p v-if="displayedSearchQuery" class="search-query-display">You searched for: {{ displayedSearchQuery }}</p>
+      <p v-if="displayedSearchQuery" class="search-query-display">
+      You searched for: 
+      <a :href ="'http://en.wikipedia.org/wiki/' + displayedSearchQuery">{{ displayedSearchQuery }}</a>
+      </p>
     </div>
   </PageContainer>
 </template>
