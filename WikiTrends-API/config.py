@@ -1,9 +1,13 @@
+from sqlalchemy import create_engine
+
 class Config:
     USER = 'aaldea'
     PASSWORD = 'bM0JAgom2tszWgUAa6k16Ofl'
     HOST = 'oracle.cise.ufl.edu'
-    PORT = 1521
+    PORT = '1521'
     SID = 'orcl'
 
-    SQLALCHEMY_DATABASE_URI = f'oracle+oracledb://{USER}:{PASSWORD}@{HOST}:{PORT}/{SID}'
+    SQLALCHEMY_DATABASE_URI = f'oracle+cx_oracle://{USER}:{PASSWORD}@{HOST}:{PORT}/?service_name={SID}'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+db_config = create_engine(Config.SQLALCHEMY_DATABASE_URI)
