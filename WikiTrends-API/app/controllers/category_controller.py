@@ -1,11 +1,11 @@
 from flask import Blueprint, jsonify
-from app.services.page_view_service import PageViewService
+from app.services.category_service import CategoryService
 from config import db_config
 
-page_view_controller = Blueprint("page_view_controller", __name__)
+category_controller = Blueprint("category_controller", __name__)
 
-@page_view_controller.route("/articles/<string:article_title>/pageviews", methods=["GET"])
-async def get_page_view(article_title):
-    page_view_service = PageViewService(db_config)
-    page_views = await page_view_service.get_page_views_by_article(article_title)
-    return jsonify([page_view.__dict__ for page_view in page_views])
+@category_controller.route("/categories/<string:category_name>", methods=["GET"])
+async def get_category(category_name):
+    category_service = CategoryService(db_config)
+    category = await category_service.get_category_by_name(category_name)
+    return jsonify(category.__dict__)

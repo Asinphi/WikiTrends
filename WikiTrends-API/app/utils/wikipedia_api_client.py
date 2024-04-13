@@ -1,22 +1,20 @@
-# wikipedia_api_client.py
 import aiohttp
 import pandas as pd
 
 class WikipediaAPIClient:
     BASE_URL = "https://en.wikipedia.org/w/api.php"
     
-    async def get_random_articles(self, limit=500000):
+    async def get_articles(self, limit=500000):
         params = {
             "action": "query",
-            "list": "random",
-            "rnnamespace": "0",
-            "rnlimit": limit,
+            "list": "allpages",
+            "aplimit": limit,
             "format": "json"
         }
         async with aiohttp.ClientSession() as session:
             async with session.get(self.BASE_URL, params=params) as response:
                 data = await response.json()
-                return [article["title"] for article in data["query"]["random"]]
+                return [article["title"] for article in data["query"]["allpages"]]
     
     async def get_article_info(self, article_title):
         params = {
@@ -43,7 +41,13 @@ class WikipediaAPIClient:
             "title": page_data["title"],
             "post_date": page_data.get("touched", ""),
             "last_updated": page_data.get("touched", ""),
-            "categories": [category["title"] for category in page_data.get("categories", [])]
+            "categories": [
+                {
+                    "category_name": category["title"],
+                    "category_link": f"https://en.wikipedia.org/wiki/{category['title'].replace(' ', '_')}"
+                }
+                for category in page_data.get("categories", [])
+            ]
         }
         
         return article_info
@@ -62,11 +66,7 @@ class WikipediaAPIClient:
                     data = await response.json()
                     df = pd.DataFrame(data['items'])
                     df = df.rename(columns={
-                        "project": "project_",
-                        "article": "article_",
-                        "timestamp": "timestamp_",
-                        "access": "access_",
-                        "agent": "agent_",
+                        "timestamp": "view_date",
                         "views": "view_count"
                     })
                     return df

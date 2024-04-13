@@ -30,8 +30,8 @@ def test_repositories():
             logging.debug("Running repository tests...")
             # Test ArticleRepository
             article_repository = ArticleRepository(engine)
-            article = Article(1, 'Test Article', datetime.now(), datetime.now())
-            article_repository.create(article)
+            article = Article(None, 'Test Article', datetime.now(), datetime.now())
+            article_id = article_repository.create(article)
             retrieved_article = article_repository.get_by_title('Test Article')
             assert retrieved_article.title == 'Test Article'
 
@@ -43,16 +43,16 @@ def test_repositories():
             category_repository.create(category)
             retrieved_category = category_repository.get_by_name('Test Category')
             assert retrieved_category.category_name == 'Test Category'
-            category_repository.add_article_category(1, retrieved_category.category_id)
+            category_repository.add_article_category(article_id, retrieved_category.category_id)
 
             logging.debug("CategoryRepository tests passed successfully!")
             logging.debug("Running PageViewRepository tests...")
 
             # Test PageViewRepository
             page_view_repository = PageViewRepository(engine)
-            page_view = PageView(1, datetime.now(), 100)
+            page_view = PageView(article_id, datetime.now(), 100)
             page_view_repository.create(page_view)
-            retrieved_page_views = page_view_repository.get_by_article_id(1)
+            retrieved_page_views = page_view_repository.get_by_article_id(article_id)
             assert len(retrieved_page_views) > 0
 
             logging.debug("PageViewRepository tests passed successfully!")

@@ -6,7 +6,3 @@ class Article:
         self.title = title
         self.post_date = post_date
         self.last_updated = last_updated
-        self.categories = []
-
-    def add_category(self, category):
-        self.categories.append(category)
