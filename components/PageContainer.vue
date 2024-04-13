@@ -24,7 +24,10 @@
   }
 
   p {
+    background-color: #ffffff;
     font-size: 1.5rem;
+    padding: 10px;
+    border-radius: 15px;
   }
 }
 </style>
