@@ -3,7 +3,6 @@
 </script>
 
 <template>
-  <h1 class="title">Who's got the highest views today?</h1>
   <PageContainer>
     <row>
     <div class="timerange-container">
@@ -82,7 +81,7 @@
   font-size: 1.5em;
   padding: 2.5%;
   height: 300px;
-  width: 200px;
+  width: 250px;
   background-color: rgb(0, 57, 106);
   align-self: flex-end; /* Align to the bottom */
 }
@@ -93,7 +92,7 @@
   font-size: 1.5em;
   padding: 2.5%;
   height: 175px;
-  width: 200px;
+  width: 250px;
   background-color: rgb(54, 138, 198);
   align-self: flex-end; /* Align to the bottom */
 }
@@ -104,8 +103,8 @@
   font-size: 1.5em;
   padding: 2.5%;
   height: 100px;
-  width: 200px;
-  background-color: rgb(139, 212, 255);
+  width: 250px;
+  background-color: rgb(116, 182, 221);
   align-self: flex-end; /* Align to the bottom */
 }
 
