@@ -7,7 +7,7 @@
     <h1>Long Lost Article</h1>
     <p>Discover a random article that has been "lost" due to low view count.</p>
     <button class="article-button" type="submit">Find an Article</button>  
-
+    <!-- Make call to grab the data -->
   </PageContainer>
 </template>
 
@@ -29,4 +29,16 @@
   transition: background-color 0.3s ease;
 }
 
+.article-button:hover {
+  background-color: #166fb8;
+}
+
+.title {
+  text-align: center;
+}
+
+p {
+  text-align: center;
+  align-items: center;
+}
 </style>
