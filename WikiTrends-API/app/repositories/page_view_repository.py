@@ -43,15 +43,15 @@ class PageViewRepository:
     def create(self, page_view):
         with self.engine.connect() as conn:
             try:
-                result = conn.execute(text("SELECT ArticleID, ViewDate FROM PageView WHERE ArticleID = :article_id AND ViewDate = :view_date"), {'article_id': page_view.article_id, 'view_date': page_view.view_date})
-                if result.fetchone() is None:
+                result_article = conn.execute(text("SELECT ArticleID FROM Article WHERE ArticleID = :article_id"), {'article_id': page_view.article_id})
+                if result_article.fetchone():
                     conn.execute(text("""
                         INSERT INTO PageView (ArticleID, ViewDate, ViewCount)
                         VALUES (:article_id, :view_date, :view_count)
                     """), {'article_id': page_view.article_id, 'view_date': page_view.view_date, 'view_count': page_view.view_count})
                     conn.commit()
                 else:
-                    print(f"PageView for ArticleID {page_view.article_id} and ViewDate {page_view.view_date} already exists.")
+                    print(f"Invalid ArticleID {page_view.article_id}.")
             except Exception as e:
                 print(f"Error inserting page view into database:\n", e)
                 conn.rollback()

@@ -1,4 +1,3 @@
-# category_repository.py
 from sqlalchemy import text
 from app.models.category import Category
 
@@ -8,13 +7,14 @@ class CategoryRepository:
         self.create_table_if_not_exists()
 
     def create_table_if_not_exists(self):
-        table_name = 'Categories'
+        table_name = 'Category'
         table = f"""
             BEGIN
                 EXECUTE IMMEDIATE 'CREATE TABLE {table_name} (
                     CategoryID INTEGER PRIMARY KEY,
                     CategoryName VARCHAR2(255) NOT NULL,
-                    ParentCategory INTEGER
+                    CategoryLink VARCHAR2(255),
+                    ParentCategory VARCHAR2(255)
                 )';
             EXCEPTION
                 WHEN OTHERS THEN
@@ -25,7 +25,7 @@ class CategoryRepository:
         """
         sequence = f"""
             BEGIN
-                EXECUTE IMMEDIATE 'CREATE SEQUENCE Categories_seq
+                EXECUTE IMMEDIATE 'CREATE SEQUENCE Category_seq
                     START WITH 1
                     INCREMENT BY 1
                     NOMAXVALUE';
@@ -48,22 +48,28 @@ class CategoryRepository:
 
     def get_by_name(self, category_name):
         with self.engine.connect() as conn:
-            result = conn.execute(text("SELECT CategoryID, CategoryName, ParentCategory FROM Categories WHERE CategoryName = :category_name"), {'category_name': category_name})
+            result = conn.execute(text("SELECT CategoryID, CategoryName, CategoryLink, ParentCategory FROM Category WHERE CategoryName = :category_name"), {'category_name': category_name})
             row = result.fetchone()
             if row:
-                category_id, category_name, parent_category = row
-                return Category(category_id, category_name, parent_category)
+                category_id, category_name, category_link, parent_category = row
+                return Category(category_id, category_name, category_link, parent_category)
             return None
 
     def create(self, category):
         with self.engine.connect() as conn:
             try:
-                result = conn.execute(text("SELECT CategoryID FROM Categories WHERE CategoryName = :category_name"), {'category_name': category.category_name})
+                result = conn.execute(text("SELECT CategoryID FROM Category WHERE CategoryName = :category_name"), {'category_name': category.category_name})
                 if result.fetchone() is None:
-                    conn.execute(text("""
-                        INSERT INTO Categories (CategoryID, CategoryName, ParentCategory)
-                        VALUES (Categories_seq.NEXTVAL, :category_name, :parent_category)
-                    """), {'category_name': category.category_name, 'parent_category': category.parent_category})
+                    if category.category_link is None:
+                        conn.execute(text("""
+                            INSERT INTO Category (CategoryID, CategoryName, ParentCategory)
+                            VALUES (Category_seq.NEXTVAL, :category_name, :parent_category)
+                        """), {'category_name': category.category_name, 'parent_category': category.parent_category})
+                    else:
+                        conn.execute(text("""
+                            INSERT INTO Category (CategoryID, CategoryName, CategoryLink, ParentCategory)
+                            VALUES (Category_seq.NEXTVAL, :category_name, :category_link, :parent_category)
+                        """), {'category_name': category.category_name, 'category_link': category.category_link, 'parent_category': category.parent_category})
                     conn.commit()
                 else:
                     print(f"Category with name {category.category_name} already exists.")
@@ -78,7 +84,9 @@ class CategoryRepository:
                 EXECUTE IMMEDIATE 'CREATE TABLE {table_name} (
                     ArticleID INTEGER NOT NULL,
                     CategoryID INTEGER NOT NULL,
-                    PRIMARY KEY (ArticleID, CategoryID)
+                    PRIMARY KEY (ArticleID, CategoryID),
+                    FOREIGN KEY (ArticleID) REFERENCES Article(ArticleID),
+                    FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID)
                 )';
             EXCEPTION
                 WHEN OTHERS THEN
@@ -94,14 +102,29 @@ class CategoryRepository:
                 connection.commit()
                 print(f"Table {table_name} created successfully.")
                 
-                result = connection.execute(text("SELECT ArticleID, CategoryID FROM HasCategory WHERE ArticleID = :article_id AND CategoryID = :category_id"), {'article_id': article_id, 'category_id': category_id})
-                if result.fetchone() is None:
-                    connection.execute(text("""
-                        INSERT INTO HasCategory (ArticleID, CategoryID)
-                        VALUES (:article_id, :category_id)
-                    """), {'article_id': article_id, 'category_id': category_id})
-                    connection.commit()
+                if article_id is not None and category_id is not None:
+                    # Check if ArticleID exists in the Article table
+                    article_result = connection.execute(text("SELECT ArticleID FROM Article WHERE ArticleID = :article_id"), {'article_id': article_id})
+                    if article_result.fetchone() is None:
+                        print(f"ArticleID {article_id} does not exist in the Article table. Skipping insertion into HasCategory.")
+                        return
+
+                    # Check if CategoryID exists in the Category table
+                    category_result = connection.execute(text("SELECT CategoryID FROM Category WHERE CategoryID = :category_id"), {'category_id': category_id})
+                    if category_result.fetchone() is None:
+                        print(f"CategoryID {category_id} does not exist in the Category table. Skipping insertion into HasCategory.")
+                        return
+
+                    result = connection.execute(text("SELECT ArticleID, CategoryID FROM HasCategory WHERE ArticleID = :article_id AND CategoryID = :category_id"), {'article_id': article_id, 'category_id': category_id})
+                    if result.fetchone() is None:
+                        connection.execute(text("""
+                            INSERT INTO HasCategory (ArticleID, CategoryID)
+                            VALUES (:article_id, :category_id)
+                        """), {'article_id': article_id, 'category_id': category_id})
+                        connection.commit()
+                    else:
+                        print(f"Article-Category relationship already exists for ArticleID {article_id} and CategoryID {category_id}.")
                 else:
-                    print(f"Article-Category relationship already exists for ArticleID {article_id} and CategoryID {category_id}.")
+                    print("ArticleID or CategoryID is None. Skipping insertion into HasCategory.")
         except Exception as e:
             print(f"Error creating table {table_name} or inserting data:\n", e)

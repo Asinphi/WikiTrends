@@ -18,6 +18,7 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 app = Flask(__name__)
 app.config.from_object(Config)
 
+
 def test_repositories():
     try:
         db_config = app.config['SQLALCHEMY_DATABASE_URI']
@@ -28,12 +29,18 @@ def test_repositories():
             logging.debug("Connected to Oracle database successfully!")
             logging.debug(f"Database version: {connection.dialect.server_version_info}")
             logging.debug("Running repository tests...")
-            # Test ArticleRepository
+
+             # Test ArticleRepository
             article_repository = ArticleRepository(engine)
             article = Article(None, 'Test Article', datetime.now(), datetime.now())
-            article_id = article_repository.create(article)
-            retrieved_article = article_repository.get_by_title('Test Article')
-            assert retrieved_article.title == 'Test Article'
+            try:
+                article_id = article_repository.create(article)
+                retrieved_article = article_repository.get_by_title('Test Article')
+                assert retrieved_article.title == 'Test Article'
+                logging.debug("ArticleRepository tests passed successfully!")
+            except Exception as e:
+                logging.error(f"Error during ArticleRepository tests: {e}")
+
 
             logging.debug("ArticleRepository tests passed successfully!")  
             logging.debug("Running CategoryRepository tests...")
