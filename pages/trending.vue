@@ -3,8 +3,8 @@
 </script>
 
 <template>
+  <h1 class="title">Who's got the highest views today?</h1>
   <PageContainer>
-
     <div class="page-container">
       <div class="second-place">
         Second
@@ -24,6 +24,12 @@
 </template>
 
 <style scoped>
+.title{
+  text-align: center;
+  justify-content: center;
+  margin-bottom: 0;
+}
+
 .page-container {
   display: flex;
   flex-direction: row;
