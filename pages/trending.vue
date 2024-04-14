@@ -57,7 +57,6 @@
 .timerange-form {
   display: flex;
   justify-content: center;
-  
 }
 
 .timerange-input {
@@ -73,6 +72,7 @@
   flex-direction: row;
   justify-content: center;
   align-items: flex-end; /* Align items at the bottom */
+  gap: 1rem;
 }
 
 .first-place {
