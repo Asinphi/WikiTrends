@@ -33,7 +33,8 @@
   /* Added so that some text wasn't in same style as p*/
 .p2 {
     font-size: 1.25rem;
-    padding: 100px;
+    padding: 10px;
+    border-radius: 15px;
   }
 
   /* Added this so rows were possible within the page-container columns*/

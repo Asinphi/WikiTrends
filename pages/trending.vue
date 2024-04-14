@@ -3,6 +3,7 @@
 </script>
 
 <template>
+  <h1 class="title">Who's got the highest views today?</h1>
   <PageContainer>
     <row>
     <div class="timerange-container">

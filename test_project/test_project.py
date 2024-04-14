@@ -84,6 +84,7 @@ table_name = 'Einstein'
 table = f"CREATE TABLE {table_name} (project_ varchar(33), article_ varchar(33), granularity varchar(33), timestamp_ int, access_ varchar(33), agent_ varchar(33), views int)"
 insert = f"insert into Einstein (project_, article_, granularity, timestamp_, access_, agent_, views) values('en.wikipedia','Albert_Einstein', 'daily', '2015100100', 'all-access', 'all-agents', '18860')"
 
+
 try:
     with engine.connect() as connection:
         if connection.dialect.has_table(connection,table_name=table_name):
