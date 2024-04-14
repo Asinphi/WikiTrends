@@ -4,17 +4,28 @@ import pandas as pd
 class WikipediaAPIClient:
     BASE_URL = "https://en.wikipedia.org/w/api.php"
     
-    async def get_articles(self, limit=50000000):
+    async def get_articles(self, limit=5000):
         params = {
             "action": "query",
             "list": "allpages",
-            "aplimit": limit,
+            "aplimit": 500000,  
+            "apfrom": "",
             "format": "json"
         }
-        async with aiohttp.ClientSession() as session:
-            async with session.get(self.BASE_URL, params=params) as response:
-                data = await response.json()
-                return [article["title"] for article in data["query"]["allpages"]]
+        
+        articles = []
+        while len(articles) < limit:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(self.BASE_URL, params=params) as response:
+                    data = await response.json()
+                    articles.extend([article["title"] for article in data["query"]["allpages"]])
+                    
+                    if "continue" in data:
+                        params["apfrom"] = data["continue"]["apcontinue"]
+                    else:
+                        break
+        
+        return articles[:limit]
     
     async def get_article_info(self, article_title):
         params = {
