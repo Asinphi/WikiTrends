@@ -49,7 +49,7 @@ async def populate_database():
                         category_repository.add_article_category(article_id, category_id)
                     
                     end_date = datetime.now().strftime("%Y%m%d")
-                    start_date = (datetime.now() - timedelta(days=30)).strftime("%Y%m%d")
+                    start_date = (datetime.now() - timedelta(days=365)).strftime("%Y%m%d")
                     page_views_df = await wikipedia_api_client.get_article_pageviews(article_title, start_date, end_date)
                     
                     if page_views_df is not None:
@@ -68,6 +68,10 @@ async def populate_database():
                     user_search_repository.create(user_search)
     except Exception as e:
         print(f"An error occurred during database population: {e}")
-
+     # Print the counts
+    print(f"Number of articles: {article_repository.count()}")
+    print(f"Number of categories: {category_repository.count()}")
+    print(f"Number of page views: {page_view_repository.count()}")
+    print(f"Number of user searches: {user_search_repository.count()}")
 if __name__ == "__main__":
     asyncio.run(populate_database())

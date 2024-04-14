@@ -56,3 +56,8 @@ class PageViewRepository:
             except Exception as e:
                 print(f"Error inserting page view into database:\n", e)
                 conn.rollback()
+
+    def count(self):
+        with self.engine.connect() as conn:
+            result = conn.execute(text("SELECT COUNT(*) FROM PageView"))
+            return result.scalar()

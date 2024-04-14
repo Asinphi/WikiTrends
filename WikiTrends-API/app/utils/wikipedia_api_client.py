@@ -4,7 +4,7 @@ import pandas as pd
 class WikipediaAPIClient:
     BASE_URL = "https://en.wikipedia.org/w/api.php"
     
-    async def get_articles(self, limit=500000):
+    async def get_articles(self, limit=50000000):
         params = {
             "action": "query",
             "list": "allpages",

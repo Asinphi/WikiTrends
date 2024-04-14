@@ -63,3 +63,8 @@ class UserSearchRepository:
             """), {'search_date': user_search.search_date, 'search_term': user_search.search_term})
             conn.commit()
             print(f"Inserted user search for term '{user_search.search_term}' on {user_search.search_date}.")
+
+    def count(self):
+        with self.engine.connect() as conn:
+            result = conn.execute(text("SELECT COUNT(*) FROM UserSearch"))
+            return result.scalar()
