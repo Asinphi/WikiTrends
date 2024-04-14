@@ -31,13 +31,13 @@
   }
 
   /* Added so that some text wasn't in same style as p*/
-  p2 {
+.p2 {
     font-size: 1.25rem;
     padding: 100px;
   }
 
   /* Added this so rows were possible within the page-container columns*/
-  row {
+.row {
     flex-direction: row;
     align-items: center;
   }
