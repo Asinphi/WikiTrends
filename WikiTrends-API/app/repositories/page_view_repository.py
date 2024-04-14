@@ -50,8 +50,9 @@ class PageViewRepository:
                         VALUES (:article_id, :view_date, :view_count)
                     """), {'article_id': page_view.article_id, 'view_date': page_view.view_date, 'view_count': page_view.view_count})
                     conn.commit()
+                    print(f"Inserted page view for ArticleID {page_view.article_id} on {page_view.view_date} with {page_view.view_count} views.")
                 else:
-                    print(f"Invalid ArticleID {page_view.article_id}.")
+                    print(f"Skipping insertion of page view as ArticleID {page_view.article_id} does not exist.")
             except Exception as e:
                 print(f"Error inserting page view into database:\n", e)
                 conn.rollback()

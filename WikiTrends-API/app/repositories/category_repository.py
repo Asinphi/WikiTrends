@@ -106,13 +106,13 @@ class CategoryRepository:
                     # Check if ArticleID exists in the Article table
                     article_result = connection.execute(text("SELECT ArticleID FROM Article WHERE ArticleID = :article_id"), {'article_id': article_id})
                     if article_result.fetchone() is None:
-                        print(f"ArticleID {article_id} does not exist in the Article table. Skipping insertion into HasCategory.")
+                        print(f"Skipping insertion into HasCategory as ArticleID {article_id} does not exist in the Article table.")
                         return
 
                     # Check if CategoryID exists in the Category table
                     category_result = connection.execute(text("SELECT CategoryID FROM Category WHERE CategoryID = :category_id"), {'category_id': category_id})
                     if category_result.fetchone() is None:
-                        print(f"CategoryID {category_id} does not exist in the Category table. Skipping insertion into HasCategory.")
+                        print(f"Skipping insertion into HasCategory as CategoryID {category_id} does not exist in the Category table.")
                         return
 
                     result = connection.execute(text("SELECT ArticleID, CategoryID FROM HasCategory WHERE ArticleID = :article_id AND CategoryID = :category_id"), {'article_id': article_id, 'category_id': category_id})
@@ -122,9 +122,16 @@ class CategoryRepository:
                             VALUES (:article_id, :category_id)
                         """), {'article_id': article_id, 'category_id': category_id})
                         connection.commit()
+                        print(f"Inserted ArticleID {article_id} and CategoryID {category_id} into HasCategory.")
                     else:
-                        print(f"Article-Category relationship already exists for ArticleID {article_id} and CategoryID {category_id}.")
+                        print(f"Skipping insertion into HasCategory as the relationship between ArticleID {article_id} and CategoryID {category_id} already exists.")
                 else:
-                    print("ArticleID or CategoryID is None. Skipping insertion into HasCategory.")
+                    print("Skipping insertion into HasCategory as either ArticleID or CategoryID is None.")
         except Exception as e:
             print(f"Error creating table {table_name} or inserting data:\n", e)
+
+
+    def count(self):
+        with self.engine.connect() as conn:
+            result = conn.execute(text("SELECT COUNT(*) FROM Category"))
+            return result.scalar()

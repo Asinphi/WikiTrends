@@ -62,3 +62,4 @@ class UserSearchRepository:
                 VALUES (UserSearch_seq.NEXTVAL, :search_date, :search_term)
             """), {'search_date': user_search.search_date, 'search_term': user_search.search_term})
             conn.commit()
+            print(f"Inserted user search for term '{user_search.search_term}' on {user_search.search_date}.")
