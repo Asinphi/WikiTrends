@@ -8,7 +8,8 @@
       </form>
       <p v-if="displayedSearchQuery" class="search-query-display">
       You searched for: 
-      <a :href ="'http://en.wikipedia.org/wiki/' + displayedSearchQuery">{{ displayedSearchQuery }}</a>
+      <!-- <a :href ="displayedSearchQuery">{{ displayedSearchQuery }}</a> -->
+      <a :href ="displayedSearchQuery">{{ displayedSearchQuery }}</a>
       </p>
     </div>
   </PageContainer>
@@ -62,22 +63,26 @@
 }
 </style>
 
-<script setup>
+
+<script setup lang="ts"> //setup 
 import { ref, watch } from 'vue';
-
-// Define a reactive variable for storing the search query
+import axios from 'axios'// Define a reactive variable for storing the search query
 const searchQuery = ref('');
-const displayedSearchQuery = ref('');
-
-// Function to handle form submission
-const handleSubmit = () => {
+const displayedSearchQuery = ref('')// Function to handle form submission
+const handleSubmit = async () => {
   if (searchQuery.value.trim() !== '') {
     // Implement search functionality here, e.g., redirect to search results page
-    console.log('Search for:', searchQuery.value.trim());
-    displayedSearchQuery.value = searchQuery.value.trim();
+    // const {data} = await $fetch('http://127.0.0.1:5000/api/search')
+    let {data} = await axios.get('http://127.0.0.1:5000/api/search')
+    window.console.log('Search for:', searchQuery.value.trim());
+    // window.console.log('Message recieved: ', JSON.stringify(data.value))
+    window.console.log('Message recieved: ', data)
+
+    // displayedSearchQuery.value = JSON.stringify(data.value)
+    displayedSearchQuery.value = data
+    // displayedSearchQuery.value = searchQuery.value.trim();
   } else {
     alert('Please enter a search query');
   }
 };
-
 </script>
