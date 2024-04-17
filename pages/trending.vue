@@ -131,7 +131,7 @@ const timeQuery = ref('');
 const displayedTimeQuery = ref('');
 
 // Function to handle form submission
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (timeQuery.value.trim() !== '') {
     const enteredDate = new Date(timeQuery.value.trim());
     const startDate = new Date('04-16-2023');
@@ -196,8 +196,8 @@ const handleSubmit = () => {
 
 
       // Call backend 
-      let {formattedDate} = await axios.get('http://127.0.0.1:5000/api/search')
-      window.console.log('Search for:', searchQuery.value.trim());
+      let {data} = await axios.get('http://127.0.0.1:5000/top-three-articles')
+      window.console.log('Search for:', formattedDate);
       window.console.log('Message recieved: ', data)
 
     } else {
