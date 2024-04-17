@@ -11,6 +11,10 @@
       <a :href ="'http://en.wikipedia.org/wiki/' + displayedSearchQuery">{{ displayedSearchQuery }}</a>
       </p>
     </div>
+    <br>
+    <ClientOnly>
+      <Graph :width="graphWidth" :margin-left="graphMarginLeft" v-if="displayedSearchQuery"/>
+    </ClientOnly>
   </PageContainer>
 </template>
 
@@ -64,6 +68,11 @@
 
 <script setup>
 import { ref, watch } from 'vue';
+
+const pageContainerWidth = process.browser ? window.innerWidth * 0.7: 0;
+const graphWidth = pageContainerWidth * 0.7;
+const graphMarginLeft = pageContainerWidth * 0.1;
+const graphMarginRight = pageContainerWidth * 0.15;
 
 // Define a reactive variable for storing the search query
 const searchQuery = ref('');
