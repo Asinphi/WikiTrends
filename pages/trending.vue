@@ -1,21 +1,17 @@
-<script setup lang="ts">
-
-</script>
-
 <template>
   <PageContainer>
     <row>
     <div class="timerange-container">
       <h1 class="timerange-title"> Trending Page </h1>
       <p2>
-        Enter a date between 01-15-2001 and the current date, in format: MM-DD-YYYY: 
+        Enter a date between 04-16-2023 and 04-16-2024, in format: MM-DD-YYYY: 
       </p2>
-      <!-- <form class="timerange-form" @submit.prevent="handleSubmit">
+      <form class="timerange-form" @submit.prevent="handleSubmit">
         <input class="timerange-input" type="search" v-model="timeQuery" placeholder="Date" aria-label="timeQuery">
         <button class="timerange-button" type="submit">Search</button>
       </form>
       <p v-if="displayedTimeQuery" class="time-query-display">
-      </p> -->
+      </p>
     </div>
 
     <div class="page-container">
@@ -128,6 +124,7 @@
 
 <script setup>
 import { ref, watch } from 'vue';
+import axios from 'axios'
 
 // Define a reactive variable for storing the time range query
 const timeQuery = ref('');
@@ -136,13 +133,84 @@ const displayedTimeQuery = ref('');
 // Function to handle form submission
 const handleSubmit = () => {
   if (timeQuery.value.trim() !== '') {
-    // Ensure the correct formatting here! MM-DD-YYY:
-    // Implement search functionality here (for the time range specified), e.g., redirect to search results page
-    console.log('Search for time range:', timeQuery.value.trim());
-    displayedTimeQuery.value = timeQuery.value.trim();
+    const enteredDate = new Date(timeQuery.value.trim());
+    const startDate = new Date('04-16-2023');
+    const endDate = new Date('04-16-2024');
+
+    const enteredMonth = enteredDate.getMonth() + 1;
+    const enteredDay = enteredDate.getDate();
+    const enteredYear = enteredDate.getFullYear().toString().slice(-2);
+
+    let monthString = '';
+    var formattedDate = '';
+
+    // Need for formatting
+    switch (enteredMonth) {
+      case 1:
+        monthString = 'JAN';
+        break;
+      case 2:
+        monthString = 'FEB';
+        break;
+      case 3:
+        monthString = 'MAR';
+        break;
+      case 4:
+        monthString = 'APR';
+        break;
+      case 5:
+        monthString = 'MAY';
+        break;
+      case 6:
+        monthString = 'JUN';
+        break;
+      case 7:
+        monthString = 'JUL';
+        break;
+      case 8:
+        monthString = 'AUG';
+        break;
+      case 9:
+        monthString = 'SEP';
+        break;
+      case 10:
+        monthString = 'OCT';
+        break;
+      case 11:
+        monthString = 'NOV';
+        break;
+      case 12:
+        monthString = 'DEC';
+        break;
+      default:
+        monthString = '';
+    }
+    formattedDate = enteredDay + '-' + monthString + '-' + enteredYear;
+
+
+    // Check if the entered date is within the specified range
+    if (enteredDate >= startDate && enteredDate <= endDate && !isNaN(enteredDate.getTime())) {
+      console.log('Search for time range:', timeQuery.value.trim());
+      displayedTimeQuery.value = timeQuery.value.trim();
+      console.log("formattedDate", formattedDate)
+
+
+      // Call backend 
+      let {formattedDate} = await axios.get('http://127.0.0.1:5000/api/search')
+      window.console.log('Search for:', searchQuery.value.trim());
+      window.console.log('Message recieved: ', data)
+
+    } else {
+      alert('Please enter a date between 04-16-2023 and 04-16-2024 in the format: MM-DD-YYYY');
+    }
   } else {
-    alert('Please enter a time range');
+    alert('Please enter a date.');
   }
+
+
+  
+
+  
 };
 
 </script>
