@@ -117,7 +117,7 @@ class ArticleRepository:
                 CREATE OR REPLACE VIEW TopThree AS
                 SELECT Title, SUM(ViewCount) AS TotalViews
                 FROM Article, PageView
-                WHERE ViewDate = :date" AND Article.ArticleID = PageView.ArticleID
+                WHERE ViewDate = ':date' AND Article.ArticleID = PageView.ArticleID
                 GROUP BY Title
                 ORDER BY TotalViews DESC
                 FETCH FIRST 3 ROWS ONLY
