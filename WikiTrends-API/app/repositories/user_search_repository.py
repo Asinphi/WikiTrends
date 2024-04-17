@@ -48,11 +48,11 @@ class UserSearchRepository:
 
     def get_by_search_term(self, search_term):
         with self.engine.connect() as conn:
-            result = conn.execute(text("SELECT SearchID, SearchDate, SearchTerm FROM UserSearch WHERE SearchTerm = :search_term"), {'search_term': search_term})
+            result = conn.execute(text("SELECT * FROM SearchResults WHERE Title = :search_term"), {'search_term': search_term})
             row = result.fetchone()
             if row:
-                search_id, search_date, search_term = row
-                return UserSearch(search_id, search_date, search_term)
+                search_term, total_views = row
+                return UserSearch(search_term=search_term, total_views=total_views)
             return None
 
     def create(self, user_search):

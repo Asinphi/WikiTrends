@@ -22,3 +22,11 @@ class ArticleService:
     async def get_article_pageviews(self, article_title, start_date, end_date):
         pageviews_data = await self.wikipedia_api_client.get_article_pageviews(article_title, start_date, end_date)
         return pageviews_data
+    
+    async def get_long_lost_article(self):
+        article = self.article_repository.get_long_lost_article()
+        return article
+
+    async def get_top_three_articles(self, date):
+        articles = self.article_repository.get_top_three_articles(date)
+        return articles

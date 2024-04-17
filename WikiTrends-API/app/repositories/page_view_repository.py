@@ -39,6 +39,8 @@ class PageViewRepository:
             result = conn.execute(text("SELECT ArticleID, ViewDate, ViewCount FROM PageView WHERE ArticleID = :article_id"), {'article_id': article_id})
             rows = result.fetchall()
             return [PageView(*row) for row in rows]
+        
+    
 
     def create(self, page_view):
         with self.engine.connect() as conn:
