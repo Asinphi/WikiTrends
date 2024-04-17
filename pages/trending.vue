@@ -1,5 +1,6 @@
 <template>
   <PageContainer>
+    <row>
     <div class="timerange-container">
       <h1 class="timerange-title">Trending Page</h1>
       <p>Enter a date between 04-16-2023 and 04-16-2024, in format: MM-DD-YYYY:</p>
@@ -29,8 +30,96 @@
         <div v-if="articles.length > 2">{{ articles[2].title }}</div>
       </div>
     </div>
+  </row>
   </PageContainer>
 </template>
+
+<style scoped>
+
+/* Time range container formatting: */
+.timerange-container {
+  text-align: center;
+  display: block;
+  flex-direction: column;
+  font-family: "Cambria";
+  padding: 15px;
+}
+
+.timerange-title {
+  font-size: 2em;
+  color: #333;
+}
+
+.timerange-form {
+  display: flex;
+  justify-content: center;
+}
+
+.timerange-input {
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  font-size: 1em;
+  width: 300px;
+}
+
+.page-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-end; /* Align items at the bottom */
+  gap: 1rem;
+}
+
+.first-place {
+  text-align: center;
+  color: white;
+  font-size: 1.5em;
+  padding: 2.5%;
+  height: 300px;
+  width: 250px;
+  background-color: rgb(0, 57, 106);
+  align-self: flex-end; /* Align to the bottom */
+}
+
+.second-place {
+  text-align: center;
+  color: white;
+  font-size: 1.5em;
+  padding: 2.5%;
+  height: 175px;
+  width: 250px;
+  background-color: rgb(54, 138, 198);
+  align-self: flex-end; /* Align to the bottom */
+}
+
+.third-place {
+  text-align: center;
+  color: white;
+  font-size: 1.5em;
+  padding: 2.5%;
+  height: 100px;
+  width: 250px;
+  background-color: rgb(116, 182, 221);
+  align-self: flex-end; /* Align to the bottom */
+}
+
+
+.timerange-button {
+  margin-left: 10px;
+  padding: 10px 20px;
+  border: 2px solid #e0dcd8;
+  border-radius: 5px;
+  background-color: #397595;
+  color: #fff;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+
+
+</style>
 
 <script setup>
 import { ref, watch } from 'vue';
