@@ -46,14 +46,6 @@ class UserSearchRepository:
         except Exception as e:
             print(f"Error creating table {table_name} or sequence:\n", e)
 
-    def get_by_search_term(self, search_term):
-        with self.engine.connect() as conn:
-            result = conn.execute(text("SELECT * FROM SearchResults WHERE Title = :search_term"), {'search_term': search_term})
-            row = result.fetchone()
-            if row:
-                search_term, total_views = row
-                return UserSearch(search_term=search_term, total_views=total_views)
-            return None
 
     def create(self, user_search):
         with self.engine.connect() as conn:
@@ -68,3 +60,24 @@ class UserSearchRepository:
         with self.engine.connect() as conn:
             result = conn.execute(text("SELECT COUNT(*) FROM UserSearch"))
             return result.scalar()
+        
+    def create_search_results_view(self):
+        with self.engine.connect() as conn:
+            conn.execute(text("""
+                CREATE OR REPLACE VIEW SearchResults AS
+                SELECT SearchTerm AS Title, SUM(ViewCount) AS TotalViews
+                FROM PageView JOIN UserSearch ON PageView.ArticleID = UserSearch.SearchID
+                GROUP BY SearchTerm
+                ORDER BY TotalViews DESC
+            """))
+            conn.commit()
+            print("View SearchResults created successfully.")
+
+    def get_by_search_term(self, search_term):
+        with self.engine.connect() as conn:
+            result = conn.execute(text("SELECT * FROM SearchResults WHERE Title = :search_term"), {'search_term': search_term})
+            row = result.fetchone()
+            if row:
+                search_term, total_views = row
+                return UserSearch(search_term=search_term, total_views=total_views)
+            return None

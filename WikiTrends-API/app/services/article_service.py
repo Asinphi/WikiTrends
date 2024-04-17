@@ -5,6 +5,8 @@ class ArticleService:
     def __init__(self, db_config):
         self.article_repository = ArticleRepository(db_config)
         self.wikipedia_api_client = WikipediaAPIClient()
+        self.article_repository.create_long_lost_articles_view()
+        self.article_repository.create_top_three_view()
 
     async def get_article(self, article_title):
         article = self.article_repository.get_by_title(article_title)

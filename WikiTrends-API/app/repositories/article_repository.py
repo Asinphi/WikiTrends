@@ -66,20 +66,7 @@ class ArticleRepository:
                 article_id, title, post_date, last_updated = row
                 return Article(article_id, title, post_date, last_updated)
             return None
-    def get_long_lost_article(self):
-        with self.engine.connect() as conn:
-            result = conn.execute(text("SELECT * FROM LongLostArticles"))
-            row = result.fetchone()
-            if row:
-                title, last_seen, total_views = row
-                return Article(title=title, last_seen=last_seen, total_views=total_views)
-            return None
 
-    def get_top_three_articles(self, date):
-        with self.engine.connect() as conn:
-            result = conn.execute(text("SELECT * FROM TopThree WHERE ViewDate = :date"), {'date': date})
-            rows = result.fetchall()
-            return [Article(title=row[0], total_views=row[1]) for row in rows]
         
     def create(self, article):
         with self.engine.connect() as conn:
@@ -109,3 +96,46 @@ class ArticleRepository:
         with self.engine.connect() as conn:
             result = conn.execute(text("SELECT COUNT(*) FROM Article"))
             return result.scalar()
+        
+    def create_long_lost_articles_view(self):
+        with self.engine.connect() as conn:
+            conn.execute(text("""
+                CREATE OR REPLACE VIEW LongLostArticles AS
+                SELECT Title, MIN(ViewDate) AS LastSeen, SUM(ViewCount) AS TotalViews
+                FROM Article JOIN PageView ON Article.ArticleID = PageView.ArticleID
+                GROUP BY Title
+                HAVING MIN(ViewDate) < (CURRENT_DATE) AND SUM(ViewCount) <= 100
+                ORDER BY dbms_random.value
+                FETCH FIRST 1 ROWS ONLY
+            """))
+            conn.commit()
+            print("View LongLostArticles created successfully.")
+
+    def create_top_three_view(self):
+        with self.engine.connect() as conn:
+            conn.execute(text("""
+                CREATE OR REPLACE VIEW TopThree AS
+                SELECT Title, SUM(ViewCount) AS TotalViews
+                FROM Article, PageView
+                WHERE ViewDate = '30-JULY-23' AND Article.ArticleID = PageView.ArticleID
+                GROUP BY Title
+                ORDER BY TotalViews DESC
+                FETCH FIRST 3 ROWS ONLY
+            """))
+            conn.commit()
+            print("View TopThree created successfully.")
+
+    def get_long_lost_article(self):
+        with self.engine.connect() as conn:
+            result = conn.execute(text("SELECT * FROM LongLostArticles"))
+            row = result.fetchone()
+            if row:
+                title, last_seen, total_views = row
+                return Article(title=title, last_seen=last_seen, total_views=total_views)
+            return None
+
+    def get_top_three_articles(self, date):
+        with self.engine.connect() as conn:
+            result = conn.execute(text("SELECT * FROM TopThree WHERE ViewDate = :date"), {'date': date})
+            rows = result.fetchall()
+            return [Article(title=row[0], total_views=row[1]) for row in rows]
