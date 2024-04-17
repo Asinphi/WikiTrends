@@ -8,7 +8,10 @@ article_controller = Blueprint("article_controller", __name__)
 async def get_article(article_title):
     article_service = ArticleService(db_config)
     article = await article_service.get_article(article_title)
-    return jsonify(article.__dict__)
+    if article:
+        return jsonify(article.__dict__)
+    else:
+        return jsonify({"message": "Article not found."}), 404
 
 @article_controller.route("/articles/<string:article_title>/pageviews", methods=["GET"])
 async def get_article_pageviews(article_title):
@@ -25,7 +28,7 @@ async def get_long_lost_article():
     if article:
         return jsonify(article.__dict__)
     else:
-        return jsonify({"message": "No long-lost article found."})
+        return jsonify({"message": "No long-lost article found."}), 404
 
 @article_controller.route("/top-three-articles", methods=["GET"])
 async def get_top_three_articles():
