@@ -1,6 +1,7 @@
 from sqlalchemy import text
 from app.models.user_search import UserSearch
 from app.models.article import Article
+from app.models.page_view import PageView
 
 class UserSearchRepository:
     def __init__(self, engine):
@@ -64,18 +65,28 @@ class UserSearchRepository:
         
     def get_search_results(self, search_term):
         with self.engine.connect() as conn:
-            conn.execute(text(f"""
-                CREATE OR REPLACE VIEW SearchResults AS
-                SELECT u.SearchTerm AS Title, SUM(p.ViewCount) AS TotalViews
-                FROM PageView p
-                JOIN UserSearch u ON p.ArticleID = u.SearchID
-                WHERE u.SearchTerm = '{search_term}'
-                GROUP BY u.SearchTerm
+            result = conn.execute(text("""
+                SELECT a.ArticleID, a.Title, a.PostDate, a.LastUpdated, p.ViewDate, p.ViewCount, 
+                    SUM(p.ViewCount) OVER (PARTITION BY a.ArticleID) AS TotalViews
+                FROM Article a
+                JOIN PageView p ON a.ArticleID = p.ArticleID
+                WHERE a.Title LIKE :search_term
                 ORDER BY TotalViews DESC
-            """))
-            result = conn.execute(text("SELECT * FROM SearchResults"))
+            """), {'search_term': f'%{search_term}%'})
             rows = result.fetchall()
-            return [Article(title=row[0], total_views=row[1], article_id=None, post_date=None, last_updated=None) for row in rows]
+
+            articles = {}
+            for row in rows:
+                article_id, title, post_date, last_updated, view_date, view_count, total_views = row
+                if article_id not in articles:
+                    articles[article_id] = {
+                        'article': Article(title=title, article_id=article_id, post_date=post_date, last_updated=last_updated, total_views=total_views),
+                        'page_views': []
+                    }
+                articles[article_id]['page_views'].append(PageView(article_id=article_id, view_date=view_date, view_count=view_count))
+
+            return [{'article': data['article'], 'page_views': data['page_views']} for data in articles.values()]
+    
     def get_by_search_term(self, search_term):
         with self.engine.connect() as conn:
             result = conn.execute(text("SELECT * FROM SearchResults WHERE Title = :search_term"), {'search_term': search_term})

@@ -6,22 +6,15 @@
         <input class="search-input" type="search" v-model="searchQuery" placeholder="Search" aria-label="Search">
         <button class="search-button" type="submit">Search</button>
       </form>
-      <p v-if="displayedSearchQuery" class="search-query-display">
-        You searched for: 
-        <a :href="'http://en.wikipedia.org/wiki/' + displayedSearchQuery">{{ displayedSearchQuery }}</a>
-      </p>
       <div v-if="articles.length > 0">
-    <ul>
-      <li v-for="(article, index) in articles" :key="index">
-        <a :href="'http://en.wikipedia.org/wiki/' + article.title">{{ article.title }}</a>
-      </li>
-    </ul>
-  </div>
+        <div v-for="(article, index) in articles" :key="index">
+          <h2>{{ article.article.title }}</h2>
+          <ClientOnly>
+            <Graph :width="graphWidth" :margin-left="graphMarginLeft" :article="article" />
+          </ClientOnly>
+        </div>
+      </div>
     </div>
-    <br>
-    <ClientOnly>
-      <Graph :width="graphWidth" :margin-left="graphMarginLeft" v-if="displayedSearchQuery"/>
-    </ClientOnly>
   </PageContainer>
 </template>
 
