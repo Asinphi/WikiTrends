@@ -63,16 +63,17 @@ class UserSearchRepository:
         
     def create_search_results_view(self, search_term):
         with self.engine.connect() as conn:
-            conn.execute(text("""
+            conn.execute(text(f"""
                 CREATE OR REPLACE VIEW SearchResults AS
                 SELECT SearchTerm AS Title, SUM(ViewCount) AS TotalViews
                 FROM PageView JOIN UserSearch ON PageView.ArticleID = UserSearch.SearchID
-                WHERE SearchTerm = :search_term
+                WHERE SearchTerm = '{search_term}'
                 GROUP BY SearchTerm
                 ORDER BY TotalViews DESC
-            """), {'search_term': search_term})
+            """))
             conn.commit()
             print(f"View SearchResults created successfully for search term: {search_term}")
+
 
     def get_by_search_term(self, search_term):
         with self.engine.connect() as conn:
