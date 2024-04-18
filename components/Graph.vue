@@ -6,14 +6,23 @@
         <g :transform="`translate(0,${innerHeight})`">
           <line :x2="innerWidth" stroke="black" stroke-width="0.5" />
           <text :x="innerWidth / 2" :y="15" text-anchor="middle" font-size="10">Date</text>
+          <text :x="innerWidth / 2" :y="15" text-anchor="middle" font-size="10">Date (Months)</text>
+        </g>
+        <g v-for="(tickValue, index) in xAxisTickFormat" :key="index"
+        :transform="`translate(0,${innerHeight - xScale(tickValue)})`">
+        <line :x2="innerWidth" stroke="black" stroke-width="0.5" />
+        <text :x="innerWidth / 2" :y="15" text-anchor="end" dominant-baseline="middle" font-size="10">{{ tickValue }}</text>
         </g>
         <g v-for="(tickValue, index) in yTicks" :key="index"
           :transform="`translate(0,${innerHeight - yScale(tickValue)})`">
           <line :x2="innerWidth" stroke="black" stroke-width="0.5" />
           <text :x="-15" :y="3" text-anchor="end" dominant-baseline="middle" font-size="10">{{ tickValue }}</text>
+          <text :x="-20" :y="3" text-anchor="end" dominant-baseline="middle" font-size="10">{{ tickValue }}</text>
         </g>
         <text :transform="`translate(-10,${innerHeight / 2})rotate(-90)`" text-anchor="middle" font-size="10">View
           Count</text>
+        <text :transform="`translate(-10,${innerHeight / 2})rotate(-90)`" text-anchor="middle" font-size="10">
+          View Count (Views)</text>
       </g>
     </svg>
   </div>
