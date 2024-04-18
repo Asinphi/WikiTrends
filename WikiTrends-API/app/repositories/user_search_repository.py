@@ -72,7 +72,7 @@ class UserSearchRepository:
                 ORDER BY TotalViews DESC
             """))
             conn.commit()
-            print(f"View SearchResults created successfully for search term: {search_term}")
+            #print(f"View SearchResults created successfully for search term: {search_term}")
 
 
     def get_by_search_term(self, search_term):

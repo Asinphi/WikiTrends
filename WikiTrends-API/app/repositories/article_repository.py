@@ -74,7 +74,7 @@ class ArticleRepository:
                 # Check if an article with the same title already exists
                 result = conn.execute(text("SELECT ArticleID FROM Article WHERE Title = :title"), {'title': article.title})
                 if result.fetchone() is not None:
-                    print(f"Skipping insertion of article '{article.title}' as it already exists.")
+                   # print(f"Skipping insertion of article '{article.title}' as it already exists.")
                     return None
 
                 result = conn.execute(text("SELECT ArticleID_seq.NEXTVAL FROM DUAL"))
@@ -85,7 +85,7 @@ class ArticleRepository:
                     VALUES (:article_id, :title, :post_date, :last_updated)
                 """), {'article_id': article.article_id, 'title': article.title, 'post_date': article.post_date, 'last_updated': article.last_updated})
                 conn.commit()
-                print(f"Inserted article '{article.title}' with ID {article_id}.")
+               # print(f"Inserted article '{article.title}' with ID {article_id}.")
                 return article_id
             except Exception as e:
                 print(f"Error inserting article '{article.title}' into database:\n", e)
