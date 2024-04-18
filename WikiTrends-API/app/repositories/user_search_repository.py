@@ -1,5 +1,6 @@
 from sqlalchemy import text
 from app.models.user_search import UserSearch
+from app.models.article import Article
 
 class UserSearchRepository:
     def __init__(self, engine):
@@ -47,13 +48,13 @@ class UserSearchRepository:
             print(f"Error creating table {table_name} or sequence:\n", e)
 
 
-    async def create(self, user_search):
-        async with self.engine.connect() as conn:
-            await conn.execute(text("""
-                INSERT INTO UserSearch (SearchDate, SearchTerm)
-                VALUES (:search_date, :search_term)
+    def create(self, user_search):
+        with self.engine.connect() as conn:
+            conn.execute(text("""
+                INSERT INTO UserSearch (SearchID, SearchDate, SearchTerm)
+                VALUES (UserSearch_seq.NEXTVAL, :search_date, :search_term)
             """), {'search_date': user_search.search_date, 'search_term': user_search.search_term})
-            await conn.commit()
+            conn.commit()
             print(f"Inserted user search for term '{user_search.search_term}' on {user_search.search_date}.")
 
     def count(self):
@@ -61,22 +62,24 @@ class UserSearchRepository:
             result = conn.execute(text("SELECT COUNT(*) FROM UserSearch"))
             return result.scalar()
         
-    async def get_search_results(self, search_term):
-        async with self.engine.connect() as conn:
-            result = await conn.execute(text(f"""
-                SELECT SearchTerm AS Title, SUM(ViewCount) AS TotalViews
-                FROM PageView JOIN UserSearch ON PageView.ArticleID = UserSearch.SearchID
-                WHERE SearchTerm = '{search_term}'
-                GROUP BY SearchTerm
+    def get_search_results(self, search_term):
+        with self.engine.connect() as conn:
+            conn.execute(text(f"""
+                CREATE OR REPLACE VIEW SearchResults AS
+                SELECT u.SearchTerm AS Title, SUM(p.ViewCount) AS TotalViews
+                FROM PageView p
+                JOIN UserSearch u ON p.ArticleID = u.SearchID
+                WHERE u.SearchTerm = '{search_term}'
+                GROUP BY u.SearchTerm
                 ORDER BY TotalViews DESC
             """))
+            result = conn.execute(text("SELECT * FROM SearchResults"))
             rows = result.fetchall()
-            return [UserSearch(search_term=row[0], total_views=row[1]) for row in rows]
-
-    async def get_by_search_term(self, search_term):
-        async with self.engine.connect() as conn:
-            result = await conn.execute(text("SELECT * FROM SearchResults WHERE Title = :search_term"), {'search_term': search_term})
-            row = await result.fetchone()
+            return [Article(title=row[0], total_views=row[1], article_id=None, post_date=None, last_updated=None) for row in rows]
+    def get_by_search_term(self, search_term):
+        with self.engine.connect() as conn:
+            result = conn.execute(text("SELECT * FROM SearchResults WHERE Title = :search_term"), {'search_term': search_term})
+            row = result.fetchone()
             if row:
                 search_term, total_views = row
                 return UserSearch(search_term=search_term, total_views=total_views)

@@ -7,12 +7,16 @@
         <button class="search-button" type="submit">Search</button>
       </form>
       <p v-if="displayedSearchQuery" class="search-query-display">
-      You searched for: 
-      <a :href ="'http://en.wikipedia.org/wiki/' + displayedSearchQuery">{{ displayedSearchQuery }}</a>
-
-      <div v-if="articles.length > 0">{{ articles[0].title }}</div>
-
+        You searched for: 
+        <a :href="'http://en.wikipedia.org/wiki/' + displayedSearchQuery">{{ displayedSearchQuery }}</a>
       </p>
+      <div v-if="articles.length > 0">
+    <ul>
+      <li v-for="(article, index) in articles" :key="index">
+        <a :href="'http://en.wikipedia.org/wiki/' + article.title">{{ article.title }}</a>
+      </li>
+    </ul>
+  </div>
     </div>
     <br>
     <ClientOnly>
@@ -20,6 +24,7 @@
     </ClientOnly>
   </PageContainer>
 </template>
+
 
 <style scoped>
 /* Scoped CSS for this component */
@@ -74,7 +79,7 @@
 import { ref, watch } from 'vue';
 import axios from 'axios';
 
-const pageContainerWidth = process.browser ? window.innerWidth * 0.7: 0;
+const pageContainerWidth = process.browser ? window.innerWidth * 0.7 : 0;
 const graphWidth = pageContainerWidth * 0.7;
 const graphMarginLeft = pageContainerWidth * 0.1;
 const graphMarginRight = pageContainerWidth * 0.15;
@@ -82,30 +87,21 @@ const graphMarginRight = pageContainerWidth * 0.15;
 // Define a reactive variable for storing the search query
 const searchQuery = ref('');
 const displayedSearchQuery = ref('');
-
+const articles = ref([]);
 
 // Function to handle form submission
 const handleSubmit = async () => {
-  
   if (searchQuery.value.trim() !== '') {
-
-    // Implement search functionality here, e.g., redirect to search results page
-    console.log('Search for:', searchQuery.value.trim());
     displayedSearchQuery.value = searchQuery.value.trim();
-
     try {
-      // Call backend API to get top three articles
-      const { data } = await axios.get(`http://127.0.0.1:5000/searches?search=${searchQuery.value.trim()}`);
-      articles.value = data;
+      const response = await axios.get(`http://127.0.0.1:5000/searches/${searchQuery.value.trim()}`);
+      articles.value = response.data;
     } catch (error) {
       console.error('Error fetching search:', error);
-      console.error('Error details:', error.toJSON()); 
       alert('An error occurred while searching.');
     }
   } else {
     alert('Please enter a search query');
   }
 };
-
 </script>
-
