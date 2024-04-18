@@ -139,7 +139,7 @@ const handleSubmit = async () => {
 
     // Check if the entered date is within the specified range
     if (enteredDate >= startDate && enteredDate <= endDate && !isNaN(enteredDate.getTime())) {
-      displayedTimeQuery.value = timeQuery.value.trim();
+      //displayedTimeQuery.value = timeQuery.value.trim();
 
       // Format the date as required by the backend
       const formattedDate = formatDate(enteredDate);

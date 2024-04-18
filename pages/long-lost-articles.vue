@@ -1,13 +1,11 @@
-<script setup lang="ts">
-
-</script>
 
 <template>
   <PageContainer>
     <h1>Long Lost Article</h1>
     <p>Discover a random article from the past year that has been "lost" due to a view count lower than 100</p>
-    <button class="article-button" type="submit">Find an Article</button>  
-    <!-- Make call to grab the data -->
+    <form class="article-form" @submit.prevent="handleSubmit">
+      <button class="article-button" type="submit">Find an Article</button>  
+    </form>
   </PageContainer>
 </template>
 
@@ -42,3 +40,27 @@ p {
   align-items: center;
 }
 </style>
+
+<script setup>
+import { ref, watch } from 'vue';
+import axios from 'axios';
+
+// Define a reactive variable for storing the time range query
+const articles = ref([]);
+
+// Function to handle form submission
+const handleSubmit = async () => {
+  // Try to call to the backend to get the random article
+  try {
+    // Call backend API to get long lost article and view count
+    const { data } = await axios.get(`http://127.0.0.1:5000/long-lost-article`);
+    articles.value = data;
+  } catch (error) {
+    console.error('Error fetching long lost article:', error);
+    console.error('Error details:', error.toJSON()); 
+    alert('An error occurred while fetching the long lost article.');
+  }
+ 
+};
+
+</script>
