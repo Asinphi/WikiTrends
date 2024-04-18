@@ -113,17 +113,18 @@ class ArticleRepository:
 
     def create_top_three_view(self, date):
         with self.engine.connect() as conn:
-            conn.execute(text("""
+            conn.execute(text(f"""
                 CREATE OR REPLACE VIEW TopThree AS
                 SELECT Title, SUM(ViewCount) AS TotalViews
                 FROM Article, PageView
-                WHERE ViewDate = ':date' AND Article.ArticleID = PageView.ArticleID
+                WHERE ViewDate = '{date}' AND Article.ArticleID = PageView.ArticleID
                 GROUP BY Title
                 ORDER BY TotalViews DESC
                 FETCH FIRST 3 ROWS ONLY
-            """), {'date': date})
+            """))
             conn.commit()
             print("View TopThree created successfully.")
+
 
     def get_long_lost_article(self):
         with self.engine.connect() as conn:
