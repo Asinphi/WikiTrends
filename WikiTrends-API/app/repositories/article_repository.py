@@ -55,7 +55,7 @@ class ArticleRepository:
             row = result.fetchone()
             if row:
                 article_id, title, post_date, last_updated = row
-                return Article(article_id, title, post_date, last_updated)
+                return Article(title=title, total_views=None, article_id=article_id, post_date=post_date, last_updated=last_updated)
             return None
     
     def get_by_date(self, date):
@@ -91,7 +91,7 @@ class ArticleRepository:
                     VALUES (:article_id, :title, :post_date, :last_updated)
                 """), {'article_id': article.article_id, 'title': article.title, 'post_date': article.post_date, 'last_updated': article.last_updated})
                 conn.commit()
-                print(f"Inserted article '{article.title}' with ID {article_id}.")
+                print(f"Inserted article '{article.title}' with ID {article.article_id}.")
                 return article_id
             except Exception as e:
                 print(f"Error inserting article '{article.title}' into database:\n", e)

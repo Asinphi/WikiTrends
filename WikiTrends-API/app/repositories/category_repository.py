@@ -135,3 +135,29 @@ class CategoryRepository:
         with self.engine.connect() as conn:
             result = conn.execute(text("SELECT COUNT(*) FROM Category"))
             return result.scalar()
+    
+    def get_category_id_for_article(self, article_id):
+        with self.engine.connect() as conn:
+            result = conn.execute(text("""
+                SELECT c.CategoryID
+                FROM Category c
+                JOIN HasCategory hc ON c.CategoryID = hc.CategoryID
+                WHERE hc.ArticleID = :article_id
+            """), {'article_id': str(article_id)})
+            row = result.fetchone()
+            if row:
+                return row[0]
+            return None
+
+    def get_by_id(self, category_id):
+        with self.engine.connect() as conn:
+            result = conn.execute(text("""
+                SELECT CategoryID, CategoryName, CategoryLink, ParentCategory
+                FROM Category
+                WHERE CategoryID = :category_id
+            """), {'category_id': category_id})
+            row = result.fetchone()
+            if row:
+                category_id, category_name, category_link, parent_category = row
+                return Category(category_id, category_name, category_link, parent_category)
+            return None
