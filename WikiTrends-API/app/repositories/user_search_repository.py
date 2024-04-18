@@ -47,13 +47,13 @@ class UserSearchRepository:
             print(f"Error creating table {table_name} or sequence:\n", e)
 
 
-    def create(self, user_search):
-        with self.engine.connect() as conn:
-            conn.execute(text("""
-                INSERT INTO UserSearch (SearchID, SearchDate, SearchTerm)
-                VALUES (UserSearch_seq.NEXTVAL, :search_date, :search_term)
+    async def create(self, user_search):
+        async with self.engine.connect() as conn:
+            await conn.execute(text("""
+                INSERT INTO UserSearch (SearchDate, SearchTerm)
+                VALUES (:search_date, :search_term)
             """), {'search_date': user_search.search_date, 'search_term': user_search.search_term})
-            conn.commit()
+            await conn.commit()
             print(f"Inserted user search for term '{user_search.search_term}' on {user_search.search_date}.")
 
     def count(self):
@@ -61,9 +61,9 @@ class UserSearchRepository:
             result = conn.execute(text("SELECT COUNT(*) FROM UserSearch"))
             return result.scalar()
         
-    def get_search_results(self, search_term):
-        with self.engine.connect() as conn:
-            result = conn.execute(text(f"""
+    async def get_search_results(self, search_term):
+        async with self.engine.connect() as conn:
+            result = await conn.execute(text(f"""
                 SELECT SearchTerm AS Title, SUM(ViewCount) AS TotalViews
                 FROM PageView JOIN UserSearch ON PageView.ArticleID = UserSearch.SearchID
                 WHERE SearchTerm = '{search_term}'
@@ -73,11 +73,10 @@ class UserSearchRepository:
             rows = result.fetchall()
             return [UserSearch(search_term=row[0], total_views=row[1]) for row in rows]
 
-
-    def get_by_search_term(self, search_term):
-        with self.engine.connect() as conn:
-            result = conn.execute(text("SELECT * FROM SearchResults WHERE Title = :search_term"), {'search_term': search_term})
-            row = result.fetchone()
+    async def get_by_search_term(self, search_term):
+        async with self.engine.connect() as conn:
+            result = await conn.execute(text("SELECT * FROM SearchResults WHERE Title = :search_term"), {'search_term': search_term})
+            row = await result.fetchone()
             if row:
                 search_term, total_views = row
                 return UserSearch(search_term=search_term, total_views=total_views)
