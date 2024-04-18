@@ -1,4 +1,6 @@
 from app.repositories.user_search_repository import UserSearchRepository
+from app.models.user_search import UserSearch
+from datetime import datetime
 
 class UserSearchService:
     def __init__(self, db_config):
