@@ -8,6 +8,7 @@
           <input class="timerange-input" type="search" v-model="timeQuery" placeholder="Date" aria-label="timeQuery">
           <button class="timerange-button" type="submit">Search</button>
         </form>
+        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
         <p v-if="displayedTimeQuery" class="time-query-display">{{ displayedTimeQuery }}</p>
       </div>
 
@@ -67,7 +68,6 @@
   flex-direction: row;
   justify-content: center;
   align-items: flex-end;
-  /* Align items at the bottom */
   gap: 1rem;
 }
 
@@ -78,9 +78,10 @@
   padding: 2.5%;
   height: 300px;
   width: 250px;
-  background-color: rgb(0, 57, 106);
+  background: linear-gradient(145deg, #ffd700, #ffec8b);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
   align-self: flex-end;
-  /* Align to the bottom */
+  border-radius: 10px;
 }
 
 .second-place {
@@ -90,9 +91,10 @@
   padding: 2.5%;
   height: 175px;
   width: 250px;
-  background-color: rgb(54, 138, 198);
+  background: linear-gradient(145deg, #c0c0c0, #f0f0f0);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
   align-self: flex-end;
-  /* Align to the bottom */
+  border-radius: 10px;
 }
 
 .third-place {
@@ -102,11 +104,11 @@
   padding: 2.5%;
   height: 100px;
   width: 250px;
-  background-color: rgb(116, 182, 221);
+  background: linear-gradient(145deg, #cd7f32, #e9b96e);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
   align-self: flex-end;
-  /* Align to the bottom */
+  border-radius: 10px;
 }
-
 
 .timerange-button {
   margin-left: 10px;
@@ -122,47 +124,40 @@
 </style>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import axios from 'axios';
+import { parseDate } from 'chrono-node';
 
-// Define a reactive variable for storing the time range query
 const timeQuery = ref('');
 const displayedTimeQuery = ref('');
 const articles = ref([]);
+const errorMessage = ref('');
 
-// Function to handle form submission
 const handleSubmit = async () => {
-  if (timeQuery.value.trim() !== '') {
-    const enteredDate = new Date(timeQuery.value.trim());
+  const input = timeQuery.value.trim();
+  if (input) {
+    const parsedDate = parseDate(input);
     const startDate = new Date('04-16-2023');
     const endDate = new Date('04-16-2024');
 
-    // Check if the entered date is within the specified range
-    if (enteredDate >= startDate && enteredDate <= endDate && !isNaN(enteredDate.getTime())) {
-      //displayedTimeQuery.value = timeQuery.value.trim();
-
-      // Format the date as required by the backend
-      const formattedDate = formatDate(enteredDate);
-
+    if (parsedDate && parsedDate >= startDate && parsedDate <= endDate) {
+      const formattedDate = formatDate(parsedDate);
+      displayedTimeQuery.value = formattedDate;
       try {
-        // Call backend API to get top three articles
         const { data } = await axios.get(`http://127.0.0.1:5000/top-three-articles?date=${formattedDate}`);
         articles.value = data;
+        errorMessage.value = ''; // Clear any previous error message
       } catch (error) {
-        console.error('Error fetching top three articles:', error);
-        console.error('Error details:', error.toJSON()); 
-        alert('An error occurred while fetching the top three articles.');
+        errorMessage.value = 'Oops! It seems our digital athletes dropped the baton. Please try fetching articles again later.';
       }
-
     } else {
-      alert('Please enter a date between 04-16-2023 and 04-16-2024 in the format: MM-DD-YYYY');
+      errorMessage.value = '🏅 Unfortunately, your date did not qualify for the time range Olympics. Please enter a date between 04-16-2023 and 04-16-2024.';
     }
   } else {
-    alert('Please enter a date.');
+    errorMessage.value = '🎉 And the "No Date Entered" event... goes to... you! Please enter a date to start the race.';
   }
 };
 
-// Function to format the date as required by the backend
 const formatDate = (date) => {
   const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
   const day = date.getDate();
