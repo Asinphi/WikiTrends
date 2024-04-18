@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
 import PageContainer from "~/components/PageContainer.vue";
+
 </script>
 
 <template>
@@ -8,11 +9,11 @@ import PageContainer from "~/components/PageContainer.vue";
     <h1>About</h1>
     <p>
       wikiTrends is a web-based application utilizing the Wikipedia API (MediaWiki) 
-      alongside the Pageview API to gather article information based upon user input. 
-      The trending page returns the top 3 trending articles for the day (or any date 
-      set by user), the search page allows a user to search by a keyword for an article 
-      and returns the view statistics for the given keyword, the "long lost article" 
-      page returns a random article older than 10 years that has a low view count.
+      alongside the Pageview API to gather article information based upon user input for 2023-2024. 
+      The trending page returns the top 3 trending articles for any date 
+      set by user in the past year, the search page allows a user to search by a keyword for an article 
+      and returns the view statistics for the given keyword if found in the database, 
+      the "long lost article" page returns a random article with a view count lower than 1.
       <br>
     </p>
     <h1>Languages</h1>
