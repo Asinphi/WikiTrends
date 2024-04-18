@@ -132,7 +132,21 @@ class ArticleRepository:
                 ORDER BY TotalViews DESC
                 FETCH FIRST 3 ROWS ONLY
             """))
-            result = conn.execute(text("SELECT * FROM TopThree"))
-            rows = result.fetchall()
-            return [Article(title=row[0], total_views=row[1], article_id=None, post_date=None, last_updated=None) for row in rows]
+            conn.commit()
+            print("View TopThree created successfully.")
 
+
+    def get_long_lost_article(self):
+        with self.engine.connect() as conn:
+            result = conn.execute(text("SELECT * FROM LongLostArticles"))
+            row = result.fetchone()
+            if row:
+                title, last_seen, total_views = row
+                return Article(title=title, last_seen=last_seen, total_views=total_views)
+            return None
+
+    def get_top_three_articles(self, date):
+        with self.engine.connect() as conn:
+            result = conn.execute(text("SELECT * FROM TopThree WHERE ViewDate = :date"), {'date': date})
+            rows = result.fetchall()
+            return [Article(title=row[0], total_views=row[1]) for row in rows]
