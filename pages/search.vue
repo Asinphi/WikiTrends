@@ -15,19 +15,40 @@
           <div v-for="(article, index) in displayedArticles" :key="index" class="graph-item">
             <h3>{{ article.article.title }}</h3>
             <ClientOnly>
-              <Graph :width="graphWidth" :margin-left="graphMarginLeft" :article="article" />
+              <Graph :width="graphWidth" :margin-left="graphMarginLeft" :article="article"
+                @graphClicked="handleGraphClick(article)" />
             </ClientOnly>
           </div>
-          <div v-if="displayedArticles.length % 2 !== 0" class="graph-item placeholder" v-for="n in 2 - (displayedArticles.length % 2)" :key="`placeholder-${n}`"></div>
+          <div v-if="displayedArticles.length % 2 !== 0" class="graph-item placeholder"
+            v-for="n in 2 - (displayedArticles.length % 2)" :key="`placeholder-${n}`"></div>
         </div>
       </div>
-      <div v-else-if="displayedSearchQuery" class="no-results">
+      <div v-if="expandedGraph" class="expanded-graph">
+  <ClientOnly>
+    <div class="expanded-graph-content">
+      <Graph
+        :width="800"
+        :margin-left="50"
+        :article="expandedGraph"
+        class="expanded-graph-graph"
+      />
+      <a
+        :href="`http://en.wikipedia.org/wiki/${expandedGraph.article.title}`"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="expanded-graph-link"
+      >
+        View on Wikipedia
+      </a>
+    </div>
+  </ClientOnly>
+</div>
+      <div v-else-if="!isLoading && displayedSearchQuery" class="no-results">
         No results found for "{{ displayedSearchQuery }}".
       </div>
     </div>
   </PageContainer>
 </template>
-
 
 <style scoped>
 .search-container {
@@ -74,6 +95,7 @@
   margin-top: 20px;
   font-size: 1.2em;
 }
+
 .search-button i {
   margin-right: 5px;
 }
@@ -124,12 +146,17 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .graph-grid-container {
-  max-height: 600px; 
+  max-height: 600px;
   width: 100%;
   overflow-y: auto;
 }
@@ -156,10 +183,42 @@
   background-color: transparent;
   box-shadow: none;
 }
+
+.expanded-graph {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999; /*hehe*/
+}
+
+
+.expanded-graph-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.expanded-graph-link {
+  display: block;
+  text-align: center;
+  margin-top: 10px;
+  color: #397595;
+  text-decoration: none;
+}
+
+.expanded-graph-link:hover {
+  text-decoration: underline;
+}
 </style>
 
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 
 const pageContainerWidth = process.browser ? window.innerWidth * 0.9 : 0;
@@ -168,17 +227,39 @@ const graphMarginLeft = ref(0);
 
 const calculateGraphDimensions = () => {
   const containerWidth = pageContainerWidth * 0.9;
-  graphWidth.value = (containerWidth / 3) - 20; // Reduced width to fit 3 graphs in a row
+  graphWidth.value = (containerWidth / 3) - 30; // Reduced width to fit 3 graphs in a row
   graphMarginLeft.value = 15; // Adjusted marginLeft to center the graphs
+};
+
+const expandedGraph = ref(null);
+
+const handleGraphClick = (article) => {
+  expandedGraph.value = article;
+};
+
+const handleDocumentClick = (event) => {
+  if (expandedGraph.value && !event.target.closest('.graph-container')) {
+    expandedGraph.value = null;
+  }
+};
+
+const handleKeyDown = (event) => {
+  if (event.key === 'Escape' && expandedGraph.value) {
+    expandedGraph.value = null;
+  }
 };
 
 onMounted(() => {
   calculateGraphDimensions();
   window.addEventListener('resize', calculateGraphDimensions);
+  document.addEventListener('click', handleDocumentClick);
+  document.addEventListener('keydown', handleKeyDown);
 });
 
 onUnmounted(() => {
   window.removeEventListener('resize', calculateGraphDimensions);
+  document.removeEventListener('click', handleDocumentClick);
+  document.removeEventListener('keydown', handleKeyDown);
 });
 
 const searchQuery = ref('');
@@ -212,4 +293,6 @@ const handleSubmit = async () => {
     alert('Please enter a search query');
   }
 };
+
+
 </script>

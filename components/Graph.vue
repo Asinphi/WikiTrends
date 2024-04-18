@@ -1,17 +1,19 @@
 <template>
   <div class="graph-container">
-    <svg :width="width" :height="height" :viewBox="`0 0 ${width} ${height}`">
+    <svg :width="width" :height="height" :viewBox="`0 0 ${width} ${height}`" @click="$emit('graphClicked')">
       <g :transform="`translate(${marginLeft},${marginTop})`">
         <path :d="linePath" fill="none" stroke="steelblue" stroke-width="1.5" />
         <g :transform="`translate(0,${innerHeight})`">
           <line :x2="innerWidth" stroke="black" stroke-width="0.5" />
           <text :x="innerWidth / 2" :y="15" text-anchor="middle" font-size="10">Date</text>
         </g>
-        <g v-for="(tickValue, index) in yTicks" :key="index" :transform="`translate(0,${innerHeight - yScale(tickValue)})`">
+        <g v-for="(tickValue, index) in yTicks" :key="index"
+          :transform="`translate(0,${innerHeight - yScale(tickValue)})`">
           <line :x2="innerWidth" stroke="black" stroke-width="0.5" />
-          <text :x="-10" :y="3" text-anchor="end" dominant-baseline="middle" font-size="10">{{ tickValue }}</text>
+          <text :x="-15" :y="3" text-anchor="end" dominant-baseline="middle" font-size="10">{{ tickValue }}</text>
         </g>
-        <text :transform="`translate(-10,${innerHeight / 2})rotate(-90)`" text-anchor="middle" font-size="10">View Count</text>
+        <text :transform="`translate(-10,${innerHeight / 2})rotate(-90)`" text-anchor="middle" font-size="10">View
+          Count</text>
       </g>
     </svg>
   </div>
@@ -49,6 +51,7 @@ export default {
     const xScale = d3.scaleTime().range([0, innerWidth]);
     const yScale = d3.scaleLinear().range([innerHeight, 0]);
     const yTicks = ref([]);
+    const xAxisTickFormat = d3.timeFormat('%b %d'); // Custom tick format for x-axis
 
     const updateGraph = () => {
       pageViews.value = props.article.page_views.map(pageView => ({
@@ -67,7 +70,7 @@ export default {
 
       yTicks.value = yScale.ticks(4);
     };
-
+    
     onMounted(updateGraph);
 
     watch(() => props.article, updateGraph);
@@ -82,6 +85,7 @@ export default {
       linePath,
       yScale,
       yTicks,
+      xAxisTickFormat,
     };
   },
 };
