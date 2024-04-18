@@ -46,6 +46,8 @@ async def get_top_three_articles():
     articles = await article_service.get_top_three_articles(date)
     if articles:
         print(f"Retrieved top three articles for date: {date}")
+        for article in articles:
+            print(f"Article: {article.title}")
         return jsonify([article.__dict__ for article in articles])
     else:
         print(f"No top three articles found for date: {date}")

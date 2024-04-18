@@ -25,11 +25,11 @@ class ArticleService:
         return pageviews_data
 
     async def get_long_lost_article(self):
-        self.article_repository.create_long_lost_articles_view()
+        
         article = self.article_repository.get_long_lost_article()
         return article
 
     async def get_top_three_articles(self, date):
-        self.article_repository.create_top_three_view(date)
+        
         articles = self.article_repository.get_top_three_articles(date)
         return articles

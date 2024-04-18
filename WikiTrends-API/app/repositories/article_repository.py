@@ -97,7 +97,7 @@ class ArticleRepository:
             result = conn.execute(text("SELECT COUNT(*) FROM Article"))
             return result.scalar()
         
-    def create_long_lost_articles_view(self):
+    def get_long_lost_article(self):
         with self.engine.connect() as conn:
             conn.execute(text("""
                 CREATE OR REPLACE VIEW LongLostArticles AS
@@ -108,26 +108,6 @@ class ArticleRepository:
                 ORDER BY dbms_random.value
                 FETCH FIRST 1 ROWS ONLY
             """))
-            conn.commit()
-            print("View LongLostArticles created successfully.")
-
-    def create_top_three_view(self, date):
-        with self.engine.connect() as conn:
-            conn.execute(text(f"""
-                CREATE OR REPLACE VIEW TopThree AS
-                SELECT Title, SUM(ViewCount) AS TotalViews
-                FROM Article, PageView
-                WHERE ViewDate = '{date}' AND Article.ArticleID = PageView.ArticleID
-                GROUP BY Title
-                ORDER BY TotalViews DESC
-                FETCH FIRST 3 ROWS ONLY
-            """))
-            conn.commit()
-            print("View TopThree created successfully.")
-
-
-    def get_long_lost_article(self):
-        with self.engine.connect() as conn:
             result = conn.execute(text("SELECT * FROM LongLostArticles"))
             row = result.fetchone()
             if row:
@@ -136,7 +116,17 @@ class ArticleRepository:
             return None
 
     def get_top_three_articles(self, date):
-            with self.engine.connect() as conn:
-                result = conn.execute(text("SELECT * FROM TopThree"))
-                rows = result.fetchall()
-                return [Article(title=row[0], total_views=row[1]) for row in rows]
+        with self.engine.connect() as conn:
+            conn.execute(text(f"""
+                CREATE OR REPLACE VIEW TopThree AS
+                SELECT Title, SUM(ViewCount) AS TotalViews
+                FROM Article JOIN PageView ON Article.ArticleID = PageView.ArticleID
+                WHERE ViewDate = '{date}'
+                GROUP BY Title
+                ORDER BY TotalViews DESC
+                FETCH FIRST 3 ROWS ONLY
+            """))
+            result = conn.execute(text("SELECT * FROM TopThree"))
+            rows = result.fetchall()
+            return [Article(title=row[0], total_views=row[1], article_id=None, post_date=None, last_updated=None) for row in rows]
+
