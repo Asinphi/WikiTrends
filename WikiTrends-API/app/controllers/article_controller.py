@@ -33,7 +33,7 @@ async def get_long_lost_article():
     article_service = ArticleService(db_config)
     article = await article_service.get_long_lost_article()
     if article:
-        print(f"Retrieved long-lost article: {article.title}"), 200
+        print(f"Retrieved long-lost article: {article}")
         return jsonify(article.__dict__)
     else:
         print("No long-lost article found.")
@@ -48,7 +48,7 @@ async def get_top_three_articles():
         print(f"Retrieved top three articles for date: {date}")
         for article in articles:
             print(f"Article: {article.title}")
-        return jsonify([article.__dict__ for article in articles]), 200
+        return jsonify([article.__dict__ for article in articles])
     else:
         print(f"No top three articles found for date: {date}")
         return jsonify({"message": "No top three articles found for the specified date."}), 404
