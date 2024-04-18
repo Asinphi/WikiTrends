@@ -5,7 +5,7 @@
 <template>
   <PageContainer>
     <h1>Long Lost Article</h1>
-    <p>Discover a random article that has been "lost" due to low view count.</p>
+    <p>Discover a random article from the past year that has been "lost" due to a view count lower than 100</p>
     <button class="article-button" type="submit">Find an Article</button>  
     <!-- Make call to grab the data -->
   </PageContainer>
