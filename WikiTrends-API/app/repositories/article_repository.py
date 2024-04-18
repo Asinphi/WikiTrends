@@ -112,7 +112,7 @@ class ArticleRepository:
             row = result.fetchone()
             if row:
                 title, last_seen, total_views = row
-                return Article(title=title, last_seen=last_seen, total_views=total_views)
+                return Article(title=title, total_views=total_views, article_id=None, post_date=None, last_updated=None)
             return None
 
     def get_top_three_articles(self, date):

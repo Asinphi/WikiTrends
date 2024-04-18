@@ -8,3 +8,6 @@ class UserSearchService:
     async def get_user_search_by_term(self, search_term):
         user_search = self.user_search_repository.get_by_search_term(search_term)
         return user_search
+    async def get_search_results(self):
+        search_results = self.user_search_repository.get_search_results()
+        return search_results
