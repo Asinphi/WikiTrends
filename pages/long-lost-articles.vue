@@ -6,7 +6,7 @@
     <form class="article-form" @submit.prevent="handleSubmit">
       <button class="article-button" type="submit">Find an Article</button>  
     </form>
-    <div v-if="articles.length > 0">{{ articles[0].title }}</div>
+    <div v-if="articles.length = 0">{{ articles[0].title }}</div>
   </PageContainer>
 </template>
 
