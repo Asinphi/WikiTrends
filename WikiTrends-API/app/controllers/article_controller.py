@@ -33,7 +33,7 @@ async def get_long_lost_article():
     article_service = ArticleService(db_config)
     article = await article_service.get_long_lost_article()
     if article:
-        print(f"Retrieved long-lost article: {article}"), 200
+        print(f"Retrieved long-lost article: {article.title}"), 200
         return jsonify(article.__dict__)
     else:
         print("No long-lost article found.")
