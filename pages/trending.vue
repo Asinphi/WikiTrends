@@ -1,41 +1,40 @@
 <template>
   <PageContainer>
     <row>
-    <div class="timerange-container">
-      <h1 class="timerange-title">Trending Page</h1>
-      <p>Enter a date between 04-16-2023 and 04-16-2024, in format: MM-DD-YYYY:</p>
-      <form class="timerange-form" @submit.prevent="handleSubmit">
-        <input class="timerange-input" type="search" v-model="timeQuery" placeholder="Date" aria-label="timeQuery">
-        <button class="timerange-button" type="submit">Search</button>
-      </form>
-      <p v-if="displayedTimeQuery" class="time-query-display">{{ displayedTimeQuery }}</p>
-    </div>
-
-    <div class="page-container">
-      <div class="second-place">
-        Second
-        <!-- Article in second place here: -->
-        <div v-if="articles.length > 1">{{ articles[1].title }}</div>
+      <div class="timerange-container">
+        <h1 class="timerange-title">Trending Page</h1>
+        <p>Enter a date between 04-16-2023 and 04-16-2024, in format: MM-DD-YYYY:</p>
+        <form class="timerange-form" @submit.prevent="handleSubmit">
+          <input class="timerange-input" type="search" v-model="timeQuery" placeholder="Date" aria-label="timeQuery">
+          <button class="timerange-button" type="submit">Search</button>
+        </form>
+        <p v-if="displayedTimeQuery" class="time-query-display">{{ displayedTimeQuery }}</p>
       </div>
 
-      <div class="first-place">
-        First
-        <!-- Article in first place here: -->
-        <div v-if="articles.length > 0">{{ articles[0].title }}</div>
-      </div>
+      <div class="page-container">
+        <div class="second-place">
+          Second
+          <!-- Article in second place here: -->
+          <div v-if="articles.length > 1">{{ articles[1].title }}</div>
+        </div>
 
-      <div class="third-place">
-        Third
-        <!-- Article in third place here: -->
-        <div v-if="articles.length > 2">{{ articles[2].title }}</div>
+        <div class="first-place">
+          First
+          <!-- Article in first place here: -->
+          <div v-if="articles.length > 0">{{ articles[0].title }}</div>
+        </div>
+
+        <div class="third-place">
+          Third
+          <!-- Article in third place here: -->
+          <div v-if="articles.length > 2">{{ articles[2].title }}</div>
+        </div>
       </div>
-    </div>
-  </row>
+    </row>
   </PageContainer>
 </template>
 
 <style scoped>
-
 /* Time range container formatting: */
 .timerange-container {
   text-align: center;
@@ -67,7 +66,8 @@
   display: flex;
   flex-direction: row;
   justify-content: center;
-  align-items: flex-end; /* Align items at the bottom */
+  align-items: flex-end;
+  /* Align items at the bottom */
   gap: 1rem;
 }
 
@@ -79,7 +79,8 @@
   height: 300px;
   width: 250px;
   background-color: rgb(0, 57, 106);
-  align-self: flex-end; /* Align to the bottom */
+  align-self: flex-end;
+  /* Align to the bottom */
 }
 
 .second-place {
@@ -90,7 +91,8 @@
   height: 175px;
   width: 250px;
   background-color: rgb(54, 138, 198);
-  align-self: flex-end; /* Align to the bottom */
+  align-self: flex-end;
+  /* Align to the bottom */
 }
 
 .third-place {
@@ -101,7 +103,8 @@
   height: 100px;
   width: 250px;
   background-color: rgb(116, 182, 221);
-  align-self: flex-end; /* Align to the bottom */
+  align-self: flex-end;
+  /* Align to the bottom */
 }
 
 
@@ -116,9 +119,6 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-
-
-
 </style>
 
 <script setup>
@@ -150,8 +150,10 @@ const handleSubmit = async () => {
         articles.value = data;
       } catch (error) {
         console.error('Error fetching top three articles:', error);
+        console.error('Error details:', error.toJSON()); 
         alert('An error occurred while fetching the top three articles.');
       }
+
     } else {
       alert('Please enter a date between 04-16-2023 and 04-16-2024 in the format: MM-DD-YYYY');
     }
