@@ -1,8 +1,8 @@
 from sqlalchemy import create_engine
 
 class Config:
-    USER = 'aaldea'
-    PASSWORD = 'bM0JAgom2tszWgUAa6k16Ofl'
+    USER = 'terry.nelson'
+    PASSWORD = '6G8IWcIQQsswp0Rw7hN1X6qO'
     HOST = 'oracle.cise.ufl.edu'
     PORT = '1521'
     SID = 'orcl'
