@@ -37,17 +37,20 @@ class WikipediaAPIClient:
         async with aiohttp.ClientSession() as session:
             async with session.get(self.BASE_URL, params=params) as response:
                 data = await response.json()
-                if "query" in data:
-                    return self._parse_article_info(data)
-                else:
-                    print(f"No information found for article: {article_title}")
-                    return None
+                if "query" in data and "pages" in data["query"]:
+                    pages = data["query"]["pages"]
+                    if pages:
+                        page_id = next(iter(pages))
+                        page_data = pages[page_id]
+                        return self._parse_article_info(page_data)
+                print(f"No information found for article: {article_title}")
+                return None
     
-    def _parse_article_info(self, data):
-        pages = data["query"]["pages"]
-        page_id = next(iter(pages))
-        page_data = pages[page_id]
-        
+    def _parse_article_info(self, page_data):
+        if "title" not in page_data:
+            print(f"No title found for page: {page_data}")
+            return None
+
         article_info = {
             "title": page_data["title"],
             "post_date": page_data.get("touched", ""),
@@ -60,7 +63,7 @@ class WikipediaAPIClient:
                 for category in page_data.get("categories", [])
             ]
         }
-        
+
         return article_info
     
     async def get_article_pageviews(self, article_title, start_date, end_date):
