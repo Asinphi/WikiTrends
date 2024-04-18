@@ -1,166 +1,94 @@
-<script setup>
-
-const props = defineProps({
-  width: {
-    type: Number,
-    default: 500
-  },
-  height: {
-    type: Number,
-    default: 450
-  },
-  marginLeft: {
-    type: Number,
-    default: 50
-  },
-  marginTop: {
-    type: Number,
-    default: 10
-  },
-  marginRight: {
-    type: Number,
-    default: 20
-  },
-  marginBottom: {
-    type: Number,
-    default: 50
-  },
-  data: {
-    type: Array,
-    default: () => []
-  }
-});
-
-useHead({
-  script: [
-    {
-      src: 'https://cdn.jsdelivr.net/npm/d3@7/+esm',
-      defer: true,
-      async: true
-    }
-  ]
-});
-
-onMounted(async () => {
-  const d3 = await import('https://cdn.jsdelivr.net/npm/d3@7/+esm');
-
-  // Create simple d3 graph
-  console.log("Creating graph");
-  // Random data; array of objects with date and value properties
-  const unparsedData = [
-    {
-      date: "01-01-2021",
-      value: 100
-    },
-    {
-      date: "01-02-2021",
-      value: 200
-    },
-    {
-      date: "01-03-2021",
-      value: 300
-    },
-    {
-      date: "01-04-2021",
-      value: 400
-    },
-    {
-      date: "01-05-2021",
-      value: 500
-    },
-    {
-      date: "01-06-2021",
-      value: 600
-    },
-    {
-      date: "01-07-2021",
-      value: 700
-    },
-    {
-      date: "01-08-2021",
-      value: 800
-    },
-    {
-      date: "01-09-2021",
-      value: 900
-    },
-    {
-      date: "01-10-2021",
-      value: 1000
-    },
-    {
-      date: "01-11-2021",
-      value: 1100
-    },
-    {
-      date: "01-12-2021",
-      value: 1200
-    },
-    {
-      date: "01-13-2021",
-      value: 1300
-    },
-    {
-      date: "01-14-2021",
-      value: 1400
-    },
-    {
-      date: "01-15-2021",
-      value: 1500
-    }
-  ]
-  const data = unparsedData.map((d) => {
-    return {
-      date: d3.timeParse("%m-%d-%Y")(d.date),
-      value: d.value
-    }
-  })
-  const chart = d3.select(".graph")
-    .append("svg")
-      .attr("width", props.width + props.marginLeft + props.marginRight)
-      .attr("height", props.height + props.marginTop + props.marginBottom)
-      .style("background", "#C9CFE5FF")
-      .style("padding", 10)
-    .append("g")
-      .attr("transform", `translate(${props.marginLeft}, ${props.marginTop})`);
-  const x = d3.scaleTime()
-    .domain(d3.extent(data, (d) => d.date))
-    .range([0, props.width]);
-  chart.append("g")
-    .attr("transform", `translate(0, ${props.height})`)
-    .call(d3.axisBottom(x));
-  const y = d3.scaleLinear()
-    .domain([0, d3.max(data, (d) => d.value)])
-    .range([props.height, 0]);
-  chart.append("g")
-    .call(d3.axisLeft(y));
-  // Add lines
-  chart.append("path")
-    .datum(data)
-    .attr("fill", "none")
-    .attr("stroke", "steelblue")
-    .attr("stroke-width", 1.5)
-    .attr("d", d3.line()
-      .x(function(d) { return x(new Date(d.date)) })
-      .y(function(d) { return y(d.value) })
-    )
-  // Add dots
-  chart.append("g")
-    .selectAll("dot")
-    .data(data)
-    .enter()
-    .append("circle")
-      .attr("cx", function(d) { return x(new Date(d.date)) } )
-      .attr("cy", function(d) { return y(d.value) } )
-      .attr("r", 5)
-      .attr("fill", "#69b3a2")
-});
-</script>
-
 <template>
-  <div class="graph"></div>
+  <div class="graph-container">
+    <svg :width="width" :height="height" :viewBox="`0 0 ${width} ${height}`">
+      <g :transform="`translate(${marginLeft},${marginTop})`">
+        <path :d="linePath" fill="none" stroke="steelblue" stroke-width="1.5" />
+        <g :transform="`translate(0,${innerHeight})`">
+          <line :x2="innerWidth" stroke="black" stroke-width="0.5" />
+          <text :x="innerWidth / 2" :y="15" text-anchor="middle" font-size="10">Date</text>
+        </g>
+        <g v-for="(tickValue, index) in yTicks" :key="index" :transform="`translate(0,${innerHeight - yScale(tickValue)})`">
+          <line :x2="innerWidth" stroke="black" stroke-width="0.5" />
+          <text :x="-10" :y="3" text-anchor="end" dominant-baseline="middle" font-size="10">{{ tickValue }}</text>
+        </g>
+        <text :transform="`translate(-10,${innerHeight / 2})rotate(-90)`" text-anchor="middle" font-size="10">View Count</text>
+      </g>
+    </svg>
+  </div>
 </template>
 
-<style scoped>
+<script>
+import { ref, onMounted, watch } from 'vue';
+import * as d3 from 'd3';
 
+export default {
+  props: {
+    width: {
+      type: Number,
+      required: true,
+    },
+    marginLeft: {
+      type: Number,
+      default: 20,
+    },
+    article: {
+      type: Object,
+      required: true,
+    },
+  },
+  setup(props) {
+    const height = 150;
+    const marginTop = 10;
+    const marginRight = 10;
+    const marginBottom = 20;
+    const innerWidth = props.width - props.marginLeft - marginRight;
+    const innerHeight = height - marginTop - marginBottom;
+
+    const pageViews = ref([]);
+    const linePath = ref('');
+    const xScale = d3.scaleTime().range([0, innerWidth]);
+    const yScale = d3.scaleLinear().range([innerHeight, 0]);
+    const yTicks = ref([]);
+
+    const updateGraph = () => {
+      pageViews.value = props.article.page_views.map(pageView => ({
+        date: new Date(pageView.view_date),
+        viewCount: pageView.view_count,
+      }));
+
+      xScale.domain(d3.extent(pageViews.value, d => d.date));
+      yScale.domain([0, d3.max(pageViews.value, d => d.viewCount)]);
+
+      const line = d3.line()
+        .x(d => xScale(d.date))
+        .y(d => yScale(d.viewCount));
+
+      linePath.value = line(pageViews.value);
+
+      yTicks.value = yScale.ticks(4);
+    };
+
+    onMounted(updateGraph);
+
+    watch(() => props.article, updateGraph);
+
+    return {
+      height,
+      marginTop,
+      marginRight,
+      marginBottom,
+      innerWidth,
+      innerHeight,
+      linePath,
+      yScale,
+      yTicks,
+    };
+  },
+};
+</script>
+
+<style scoped>
+.graph-container {
+  margin-top: 10px;
+}
 </style>
