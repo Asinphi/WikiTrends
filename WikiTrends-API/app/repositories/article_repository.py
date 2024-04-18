@@ -136,7 +136,7 @@ class ArticleRepository:
             return None
 
     def get_top_three_articles(self, date):
-        with self.engine.connect() as conn:
-            result = conn.execute(text("SELECT * FROM TopThree WHERE ViewDate = :date"), {'date': date})
-            rows = result.fetchall()
-            return [Article(title=row[0], total_views=row[1]) for row in rows]
+            with self.engine.connect() as conn:
+                result = conn.execute(text("SELECT * FROM TopThree"))
+                rows = result.fetchall()
+                return [Article(title=row[0], total_views=row[1]) for row in rows]
