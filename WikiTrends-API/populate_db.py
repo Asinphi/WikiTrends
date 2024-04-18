@@ -27,11 +27,11 @@ async def populate_database():
     try:
         for article_title in articles:
             article_info = await wikipedia_api_client.get_article_info(article_title)
-            
+            print(f"Processing article: {article_title}")
             if article_info:
                 article = Article(
                     None,
-                    article_info["title"],
+                    article_info.get("title", ""),
                     datetime.strptime(article_info["post_date"], "%Y-%m-%dT%H:%M:%SZ"),
                     datetime.strptime(article_info["last_updated"], "%Y-%m-%dT%H:%M:%SZ")
                 )

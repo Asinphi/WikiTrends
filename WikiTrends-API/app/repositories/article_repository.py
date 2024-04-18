@@ -71,6 +71,12 @@ class ArticleRepository:
     def create(self, article):
         with self.engine.connect() as conn:
             try:
+                # Check if the article has a valid title
+                if not article.title or not article.title.strip():
+                    print(f"Article title: {article.title}")   
+                    print(f"Skipping insertion of article with empty title.")
+                    return None
+
                 # Check if an article with the same title already exists
                 result = conn.execute(text("SELECT ArticleID FROM Article WHERE Title = :title"), {'title': article.title})
                 if result.fetchone() is not None:
@@ -91,7 +97,7 @@ class ArticleRepository:
                 print(f"Error inserting article '{article.title}' into database:\n", e)
                 conn.rollback()
                 raise
-            
+
     def count(self):
         with self.engine.connect() as conn:
             result = conn.execute(text("SELECT COUNT(*) FROM Article"))
