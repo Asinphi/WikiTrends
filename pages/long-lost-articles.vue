@@ -6,6 +6,7 @@
     <form class="article-form" @submit.prevent="handleSubmit">
       <button class="article-button" type="submit">Find an Article</button>  
     </form>
+    <div >{{ article.title }}</div>
   </PageContainer>
 </template>
 
@@ -46,6 +47,7 @@ import { ref, watch } from 'vue';
 import axios from 'axios';
 
 // Define a reactive variable for storing the time range query
+const article = ref('');
 
 // Function to handle form submission
 const handleSubmit = async () => {
@@ -53,6 +55,7 @@ const handleSubmit = async () => {
   try {
     // Call backend API to get long lost article and view count
     const { data } = await axios.get(`http://127.0.0.1:5000/long-lost-article`);
+    article.value = data;
   } catch (error) {
     console.error('Error fetching long lost article:', error);
     console.error('Error details:', error.toJSON()); 
